@@ -4,7 +4,6 @@
       <header class="header">
         <calcite-icon icon="beaker" scale="m" aria-hidden="true"></calcite-icon>
         <h2 class="heading">ArcGIS Vue and Calcite</h2>
-        
       </header>
     </slot>
     <div v-if="!loading">
@@ -45,7 +44,6 @@ export default {
       this.showPrint = !this.showPrint
     },
     toggleLoadingHandler() {
-      console.log('hello')
       this.loading = false
     }
   }
