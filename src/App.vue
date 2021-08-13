@@ -4,11 +4,16 @@
       <header class="header">
         <calcite-icon icon="beaker" scale="m" aria-hidden="true"></calcite-icon>
         <h2 class="heading">ArcGIS Vue and Calcite</h2>
-        <button @click="togglePrintHandler" class="button-print">Print</button>
+        
       </header>
     </slot>
+    <div v-if="!loading">
+      <button @click="togglePrintHandler" class="button-print esri-widget--button">
+        <calcite-icon icon="print" scale="m" aria-hidden="true"></calcite-icon>
+      </button>
+    </div>
     <Print :show="showPrint"/>
-    <WebMap />
+    <WebMap @finishloading="toggleLoadingHandler" />
   </calcite-shell>
 </template>
 
@@ -18,6 +23,7 @@ import WebMap from './components/WebMap.vue';
 import Print from './components/Print.vue';
 import '@esri/calcite-components/dist/custom-elements/bundles/shell';
 import '@esri/calcite-components/dist/custom-elements/bundles/icon';
+
 import { commitAssetPath } from '@arcgis/core/widgets/support/componentsUtils';
 
 commitAssetPath();
@@ -31,11 +37,16 @@ export default {
   data: function () {
     return {
       showPrint: false,
+      loading: true,
     }
   },
   methods: {
     togglePrintHandler() {
       this.showPrint = !this.showPrint
+    },
+    toggleLoadingHandler() {
+      console.log('hello')
+      this.loading = false
     }
   }
 
@@ -70,12 +81,13 @@ body {
 }
 
 .button-print{
-  background-color: transparent;
-  border: 1px solid #fff;
-  color : #fff;
-  font-weight: 700;
-  min-width: 8rem;
-  padding: 0.25rem 0.75rem;
+  position: absolute;
+  bottom: 90px;
+  left: 15px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .heading {

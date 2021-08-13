@@ -7,6 +7,7 @@ export default {
     name: 'WebMap',
     async mounted() {
         const app = await import('../data/map');
+        this.$emit('finishloading')
         app.initialize(this.$el);
     }
 };
