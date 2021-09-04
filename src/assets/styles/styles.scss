@@ -1,0 +1,51 @@
+@import "~@esri/calcite-colors/dist/colors"; // calcite colors
+@import "components/helpers";
+@import "components/layouts/loader.scss";
+@import "components/layouts/menu";
+
+*{
+  box-sizing: border-box;
+}
+.mt{
+  margin-top: 15px;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  letter-spacing: 0em;
+  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+  font-feature-settings: "liga" 1, "calt" 0;
+}
+
+#app{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  background: $h-bb-060;
+  padding: 0.5rem;
+}
+
+.button-print{
+  position: absolute;
+  bottom: 90px;
+  left: 15px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heading {
+  margin: 0.5rem;
+}

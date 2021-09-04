@@ -7,7 +7,7 @@ export default {
     name: 'WebMap',
     async mounted() {
         const app = await import('../data/map');
-        this.$emit('finishloading')
+        setTimeout(() => this.$emit('finishloading'), 500);
         app.initialize(this.$el);
     }
 };

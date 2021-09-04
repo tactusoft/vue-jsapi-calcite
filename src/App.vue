@@ -1,94 +1,57 @@
 <template>
   <calcite-shell>
     <slot name="shell-header">
-      <header class="header">
-        <calcite-icon icon="beaker" scale="m" aria-hidden="true"></calcite-icon>
-        <h2 class="heading">ArcGIS Vue and Calcite</h2>
-      </header>
+      <Header />
     </slot>
     <div v-if="!loading">
       <button @click="togglePrintHandler" class="button-print esri-widget--button">
         <calcite-icon icon="print" scale="m" aria-hidden="true"></calcite-icon>
       </button>
+      <Menu />
+    </div>
+    <div v-else>
+      <Loader />
     </div>
     <Print :show="showPrint"/>
     <WebMap @finishloading="toggleLoadingHandler" />
   </calcite-shell>
 </template>
 
-<script>
-
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
+import './assets/styles/styles.scss';
+import { commitAssetPath } from '@arcgis/core/widgets/support/componentsUtils';
+import Header from './components/layouts/Header.vue';
+import Menu from './components/layouts/Menu.vue';
+import Loader from './components/layouts/Loader.vue';
 import WebMap from './components/WebMap.vue';
 import Print from './components/Print.vue';
 import '@esri/calcite-components/dist/custom-elements/bundles/shell';
-import '@esri/calcite-components/dist/custom-elements/bundles/icon';
-
-import { commitAssetPath } from '@arcgis/core/widgets/support/componentsUtils';
 
 commitAssetPath();
 
-export default {
+export default defineComponent({
   name: 'App',
   components: {
     WebMap,
-    Print
+    Print,
+    Header,
+    Loader,
+    Menu
   },
-  data: function () {
-    return {
-      showPrint: false,
-      loading: true,
-    }
-  },
-  methods: {
-    togglePrintHandler() {
+  setup () {
+    const showPrint = ref(false);
+    const loading = ref(false);
+
+    function togglePrintHandler () {
       this.showPrint = !this.showPrint
-    },
-    toggleLoadingHandler() {
+    }
+
+    function toggleLoadingHandler () {
       this.loading = false
     }
+
+    return { showPrint, loading, togglePrintHandler, toggleLoadingHandler}
   }
-
-}
+});
 </script>
-<style lang="scss">
-@import "~@esri/calcite-colors/dist/colors"; // calcite colors
-html,
-body {
-  padding: 0;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  letter-spacing: 0em;
-  font-family: "Avenir Next", "Helvetica Neue", sans-serif;
-  font-feature-settings: "liga" 1, "calt" 0;
-}
-
-#app{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  color: #fff;
-  background: $h-bb-060;
-  padding: 0.5rem;
-}
-
-.button-print{
-  position: absolute;
-  bottom: 90px;
-  left: 15px;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.heading {
-  margin: 0.5rem;
-}
-</style>

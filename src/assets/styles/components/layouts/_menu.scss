@@ -1,0 +1,48 @@
+.menu{
+    margin-top: 70px;
+    height: calc(100vh - 70px);
+    background-color:#fff;
+    width: 400px;
+    position: absolute;
+    right: -400px;
+    top: 0;
+    z-index: 10000;
+    transition: all 0.5s linear;
+  
+    &__button-toggle{
+      position: absolute;
+      left: -75px;
+      top: 0;
+    }
+    &__header{
+      height: 70px;
+      width: 400px;
+      background-color: #F3F3F3;
+      box-shadow: 0px 2px 1px rgba(0,0,0, .16);
+      z-index: 0;
+      position: fixed;
+      padding: 1rem;
+    }
+    &__content{
+      margin-top: 70px;
+      padding: 1rem;
+      padding-top: 0.5rem;
+      height: calc(100% - 70px);
+      overflow: auto;
+      &__category{
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #F3F3F3;
+      }
+      &__list{
+        padding-top: 1.25rem;
+      }
+    }
+    &__title{
+      font-weight: 500;
+      font-size: 17px;
+    }
+  
+    &.is-active{
+      right: 5px;
+    }
+  }
