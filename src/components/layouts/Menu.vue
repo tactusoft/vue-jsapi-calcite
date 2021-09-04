@@ -34,7 +34,7 @@
             <ViewExample1 />
         </div>
         <div v-if="currentView === 'plain'" class="route-content">
-            <ViewExample1 />
+            <ViewExample2 />
         </div>
       </div>
     </div>
