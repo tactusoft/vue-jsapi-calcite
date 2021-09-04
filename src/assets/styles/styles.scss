@@ -2,13 +2,7 @@
 @import "components/helpers";
 @import "components/layouts/loader.scss";
 @import "components/layouts/menu";
-
-*{
-  box-sizing: border-box;
-}
-.mt{
-  margin-top: 15px;
-}
+@import "components/layouts/route";
 
 html,
 body {

@@ -1,0 +1,14 @@
+@keyframes route-content {
+    from {
+      transform: translateX(-50px);
+      opacity: 0.3
+    }
+    to {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+  .route-content{
+    animation-name: route-content;
+    animation-duration: 0.5s;
+  }

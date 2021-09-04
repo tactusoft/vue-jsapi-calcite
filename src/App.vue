@@ -27,6 +27,8 @@ import Loader from './components/layouts/Loader.vue';
 import WebMap from './components/WebMap.vue';
 import Print from './components/Print.vue';
 import '@esri/calcite-components/dist/custom-elements/bundles/shell';
+import '@esri/calcite-components/dist/custom-elements/bundles/icon';
+
 
 commitAssetPath();
 

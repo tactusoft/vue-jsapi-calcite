@@ -9,11 +9,19 @@
     z-index: 10000;
     transition: all 0.5s linear;
   
-    &__button-toggle{
+    &__button{
       position: absolute;
-      left: -75px;
-      top: 0;
+      &--toggle{
+        left: -75px;
+        top: 0;
+      }
+      &--back{
+        right: 0;
+        top: 70px;
+      }
+      
     }
+
     &__header{
       height: 70px;
       width: 400px;
@@ -39,7 +47,7 @@
     }
     &__title{
       font-weight: 500;
-      font-size: 17px;
+      font-size: 18px;
     }
   
     &.is-active{
