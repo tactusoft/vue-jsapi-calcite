@@ -68,5 +68,8 @@
   
     &.is-active{
       right: 5px;
+      @media only screen and (max-width: $M-PHONE) {
+        right: 0px;
+      }
     }
   }
