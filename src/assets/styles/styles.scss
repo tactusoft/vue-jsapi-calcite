@@ -1,4 +1,5 @@
 @import "~@esri/calcite-colors/dist/colors"; // calcite colors
+@import "components/variables";
 @import "components/helpers";
 @import "components/layouts/loader.scss";
 @import "components/layouts/menu";
@@ -38,6 +39,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
+
 }
 
 .heading {

@@ -43,14 +43,14 @@ export default defineComponent({
   },
   setup () {
     const showPrint = ref(false);
-    const loading = ref(false);
+    const loading = ref(true);
 
     function togglePrintHandler () {
-      this.showPrint = !this.showPrint
+      showPrint.value = !showPrint.value;
     }
 
     function toggleLoadingHandler () {
-      this.loading = false
+      loading.value = false;
     }
 
     return { showPrint, loading, togglePrintHandler, toggleLoadingHandler}
