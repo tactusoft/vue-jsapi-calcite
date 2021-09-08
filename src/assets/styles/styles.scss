@@ -54,6 +54,13 @@ body {
   user-select: none;
 }
 
+.esri-expand__container--expanded{
+  left: 60px !important;
+}
+.esri-expand__mask--expanded{
+  background-color: transparent !important;
+}
+
 .heading {
   margin: 0.5rem;
 }
