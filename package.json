@@ -10,7 +10,9 @@
   "dependencies": {
     "@arcgis/core": "~4.20.1",
     "core-js": "^3.6.5",
-    "vue": "^3.0.0"
+    "interactjs": "^1.10.11",
+    "vue": "^3.0.0",
+    "vue3-moveable": "^0.1.0"
   },
   "devDependencies": {
     "@stencil/webpack": "0.0.6",

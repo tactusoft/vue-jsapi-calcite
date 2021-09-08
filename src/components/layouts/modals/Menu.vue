@@ -1,6 +1,6 @@
 <template>
-    <div class="menu" :class="showMenu ? 'is-active' : '' ">
-      <calcite-button class="menu__button menu__button--toggle" @click="showMenuHandler">
+    <div class="menu" :class="show ? 'is-active' : '' ">
+      <calcite-button class="menu__button menu__button--toggle" @click="$emit('toggleShowMenu')">
         <calcite-icon icon="hamburger" appear ance="outline" scale="s" aria-hidden="true"></calcite-icon>
       </calcite-button>
       <div class="menu__header">
@@ -44,8 +44,8 @@
 import { defineComponent, ref} from 'vue'
 import Category from './menu/Category.vue';
 import List from './menu/List.vue';
-import ViewExample1 from '../../views/menu/ViewExample1.vue';
-import ViewExample2 from '../../views/menu/ViewExample2.vue';
+import ViewExample1 from '../../../views/menu/ViewExample1.vue';
+import ViewExample2 from '../../../views/menu/ViewExample2.vue';
 
 import '@esri/calcite-components/dist/custom-elements/bundles/button';
 import '@esri/calcite-components/dist/custom-elements/bundles/icon';
@@ -56,13 +56,14 @@ export default defineComponent({
     name: 'Menu',
     components: { Category, List, ViewExample1, ViewExample2},
     emits: ['routing'],
+    props: {
+      show: {
+        type: Boolean,
+        required: true,
+      }
+    },
     setup (){
-        const showMenu = ref(false);
         const currentView = ref('home');
-
-        const showMenuHandler = () => {
-            showMenu.value = !showMenu.value;
-        }
 
         const routingHandler = (route) => {
           currentView.value = route;
@@ -72,7 +73,7 @@ export default defineComponent({
           currentView.value = 'home'
         }
 
-        return {showMenu, showMenuHandler, currentView, routingHandler, goBackHandler};
+        return {currentView, routingHandler, goBackHandler};
     }
 })
 </script>

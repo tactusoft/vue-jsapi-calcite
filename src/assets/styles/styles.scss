@@ -26,21 +26,32 @@ body {
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   color: #fff;
   background: $h-bb-060;
   padding: 0.5rem;
+  &__menu-button{
+    display: none;
+    @media only screen and (max-width: $M-PHONE) {
+      display: block;
+    }
+  }
 }
 
 .button-print{
   position: absolute;
-  bottom: 90px;
+  bottom: 10%;
   left: 15px;
-  z-index: 1000;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+}
 
+
+.printDrag {
+  touch-action: none;
+  user-select: none;
 }
 
 .heading {
