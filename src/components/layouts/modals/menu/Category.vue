@@ -1,9 +1,9 @@
 <template>
-    <div class="flex flex--column flex--align-items-center">
+    <div class="flex flex--column flex--align-items-center category" @click="$emit('routing', route)">
         <calcite-button round :color="color" disabled>
             <calcite-icon :icon="icon" scale="s" aria-hidden="true"></calcite-icon>
         </calcite-button>
-        <calcite-link class="mt">{{ text }}</calcite-link>
+        <calcite-link class="mt" >{{ text }}</calcite-link>
     </div>
 </template>
 
@@ -14,6 +14,7 @@ import '@esri/calcite-components/dist/custom-elements/bundles/link';
 
 export default defineComponent({
     name: 'Category',
+    emits: ['routing'],
     props: {
         color: {
             type: String,
@@ -26,6 +27,9 @@ export default defineComponent({
         text: {
             type: String,
             default: 'Default text'
+        },
+        route: {
+            type: String,
         } 
     }
 })

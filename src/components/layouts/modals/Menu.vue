@@ -10,20 +10,23 @@
       <calcite-button @click="goBackHandler" appearance="transparent" class="menu__button menu__button--back">
         <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
       </calcite-button>
+      <!--- Home --->
         <div v-if="currentView === 'home'" class="route-content">
             <div class="menu__content__category">
               <h2 class="menu__title">Category</h2>
               <div class="flex flex--justify-content-space-around mt">
-                <Category color="blue" icon="beaker" text="Danger zone"/>
-                <Category color="inverse" icon="check-shield" text="Save zone"/>
-                <Category color="blue" icon="analysis" text="Checking zone"/>
+                <Category color="blue" icon="beaker" text="Danger zone" route="rivers" @routing="routingHandler($event)"/>
+                <Category color="inverse" icon="check-shield" text="Save zone" route="rivers" @routing="routingHandler($event)"/>
+                <Category color="blue" icon="analysis" text="Checking zone" route="rivers" @routing="routingHandler($event)"/>
               </div>
             </div>
+            <!--- List for the links --->
             <div class="menu__content__list">
               <List @routing="routingHandler($event)"/>
             </div>
         </div>
 
+        <!--- Views --->
         <div v-if="currentView === 'rivers'" class="route-content">
             <ViewExample1 />
         </div>
