@@ -73,3 +73,10 @@ export default defineComponent({
   },
 });
 </script>
+<style >
+:root{
+  --calcite-ui-brand: #fab62d;
+  --calcite-ui-brand-hover: #fab62d;
+  --calcite-ui-brand-press: #fab62d;
+}
+</style>
