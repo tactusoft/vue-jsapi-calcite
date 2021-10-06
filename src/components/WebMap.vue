@@ -5,6 +5,9 @@
 <script>
 export default {
     name: 'WebMap',
+    async created() {
+        document.title = 'Secretaría de Cultura, Recreación y Deporte';
+    },
     async mounted() {
         const app = await import('../data/map');
         setTimeout(() => this.$emit('finishloading'), 500);

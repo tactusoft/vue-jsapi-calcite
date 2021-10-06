@@ -4,12 +4,16 @@ import WebMap from '@arcgis/core/WebMap';
 import Expand from '@arcgis/core/widgets/Expand';
 import Legend from '@arcgis/core/widgets/Legend';
 import Print from '@arcgis/core/widgets/Print';
+import Home from '@arcgis/core/widgets/Home';
+//import ScaleBar from '@arcgis/core/widgets/ScaleBar';
+import Locate from '@arcgis/core/widgets/Locate';
+//import Search from '@arcgis/core/widgets/Search';
 
 config.assetsPath = './assets';
 
 export const webmap = new WebMap({
     portalItem: {
-        id: 'f2e9b762544945f390ca4ac3671cfa72'
+        id: '7b0495780f954b8493bba68c65e800fb'
     }
 });
 
@@ -27,6 +31,11 @@ export const legend = new Expand({
     expanded: true
 });
 view.ui.add(legend, 'bottom-left');
+
+view.ui.add(new Home({ id: "homeWidget", view }), 'top-left');
+view.ui.add(new Locate({ view }), 'top-left');
+//view.ui.add(new ScaleBar({ id: "scaleBarWidget", view, style: 'ruler' }), 'bottom-right');
+//view.ui.add(new Search({ view }), 'bottom-trailing');
 
 /**
  * Assigns the container element to the View
