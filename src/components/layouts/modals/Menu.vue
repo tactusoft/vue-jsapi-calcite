@@ -6,8 +6,6 @@
     >
       <calcite-icon
         icon="hamburger"
-        appear
-        ance="outline"
         scale="s"
         aria-hidden="true"
       ></calcite-icon>
@@ -20,6 +18,7 @@
         @click="goBackHandler"
         appearance="transparent"
         class="menu__button menu__button--back"
+        color="red"
       >
         <calcite-icon
           icon="arrow-bold-left"
@@ -32,10 +31,9 @@
           <h2 class="menu__title">Categorías</h2>
           <div class="flex flex--justify-content-space-around mt">
             <Category
-              color="red"
               icon="beaker"
               text="SICON"
-              route="rivers"
+              route="SICON"
               @routing="routingHandler($event)"
             />
             <Category color="inverse" icon="check-shield" text="Bibliotecas" />
@@ -47,10 +45,10 @@
         </div>
       </div>
 
-      <div v-if="currentView === 'rivers'" class="route-content">
+      <div v-if="currentView === 'SICON'" class="route-content">
         <ViewSICON />
       </div>
-      <div v-if="currentView === 'river1'" class="route-content">
+      <div v-if="currentView === 'rivers'" class="route-content">
         <ViewExample1 />
       </div>
       <div v-if="currentView === 'mountain'" class="route-content">

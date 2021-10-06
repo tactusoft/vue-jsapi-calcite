@@ -1,7 +1,7 @@
 @import "~@esri/calcite-colors/dist/colors"; // calcite colors
 @import "components/variables";
 @import "components/helpers";
-@import "components/layouts/loader.scss";
+@import "components/layouts/loader";
 @import "components/layouts/menu";
 @import "components/layouts/route";
 
@@ -55,7 +55,7 @@ body {
 }
 
 .esri-expand__container--expanded{
-  left: 60px !important;
+  left: 0 !important;
 }
 .esri-expand__mask--expanded{
   background-color: transparent !important;
@@ -68,5 +68,4 @@ body {
 .category{
   width: 30%;
   margin-top: 10px;
-  cursor: pointer;
 }

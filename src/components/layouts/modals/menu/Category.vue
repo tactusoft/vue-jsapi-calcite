@@ -1,12 +1,11 @@
 <template>
   <div
-    class="flex flex--column flex--align-items-center"
-    @click="$emit('routing', route)"
+    class="flex flex--column flex--align-items-center category"
   >
     <calcite-button round :color="color" disabled>
       <calcite-icon :icon="icon" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
-    <calcite-link class="mt">{{ text }}</calcite-link>
+    <calcite-link class="mt"  @click="$emit('routing', route)">{{ text }}</calcite-link>
   </div>
 </template>
 

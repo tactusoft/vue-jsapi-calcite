@@ -1,5 +1,5 @@
 <template>
-    <div class="loader">
+    <div class="loader" :class="menu && 'loader--menu'">
         <calcite-loader active></calcite-loader>
       </div>
 </template>
@@ -9,6 +9,11 @@ import { defineComponent } from 'vue'
 import '@esri/calcite-components/dist/custom-elements/bundles/loader';
 
 export default defineComponent({
-    name: 'Loader'
+    name: 'Loader',
+    props: {
+        menu:{
+            type: Boolean
+        }
+    }
 })
 </script>

@@ -1,26 +1,29 @@
 <template>
   <div>
-    <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
-    <div class="mt-3">
-      <calcite-label
-        >Entidad
-        <calcite-select></calcite-select>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
-      <calcite-label
-        >Año
-        <calcite-select></calcite-select>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
-      <calcite-label
-        >Estado
-        <calcite-select></calcite-select>
-      </calcite-label>
+    <Loader v-if="loading" menu />
+    <div v-else>
+      <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
+      <div class="mt-3">
+        <calcite-label
+          >Entidad
+          <calcite-select></calcite-select>
+        </calcite-label>
+      </div>
+      <div class="mt-3">
+        <calcite-label
+          >Año
+          <calcite-select></calcite-select>
+        </calcite-label>
+      </div>
+      <div class="mt-3">
+        <calcite-label
+          >Estado
+          <calcite-select></calcite-select>
+        </calcite-label>
+      </div>
     </div>
     <div class="mt-5">
-      <calcite-button iconStart="search" width="full" @click="searchClick()"
+      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading"
         >Buscar</calcite-button
       >
     </div>
@@ -28,12 +31,13 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, onUnmounted } from "vue";
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 
 import "@esri/calcite-components/dist/custom-elements/bundles/input";
 import "@esri/calcite-components/dist/custom-elements/bundles/select";
 import "@esri/calcite-components/dist/custom-elements/bundles/switch";
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
+import Loader from '@/components/layouts/Loader.vue'
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
@@ -44,11 +48,12 @@ import API from "../../data/api";
 
 export default defineComponent({
   name: "ViewSICON",
-
+  components: {Loader},
   setup() {
     let app;
     let localidadGraphics = [];
     let layer;
+    const loading = ref(false);
 
     onMounted(async () => {
       app = await import("../../data/map");
@@ -69,7 +74,7 @@ export default defineComponent({
       });
       query
         .executeQueryJSON(
-          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/Mapa_Referencia/Mapa_Referencia/MapServer/48",
+          process.env.VUE_APP_URL_QUERYLOCALITIES,
           queryParamas
         )
         .then((results) => {
@@ -220,13 +225,14 @@ export default defineComponent({
       params.append("entidad", "IDARTES");
       params.append("anio", "2020");
       params.append("estado", "Ganadora");
-
+      loading.value = true;
       API({
         method: "post",
-        url: "http://sis.scrd.gov.co/crud_SCRD_pv/api/Intercambioinformacion/geo_sicon_propuestas",
+        url: "Intercambioinformacion/geo_sicon_propuestas",
         data: params,
       })
         .then(function (response) {
+          loading.value = false;
           let arr = [];
           for (let item of response.data) {
             const result = arr.filter(
@@ -245,6 +251,7 @@ export default defineComponent({
         })
         .catch(function (response) {
           //handle error
+          loading.value = false;
           console.log(response);
         });
     }
@@ -252,6 +259,7 @@ export default defineComponent({
     return {
       searchClick,
       localidadGraphics,
+      loading
     };
   },
 });
