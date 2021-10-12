@@ -6,24 +6,52 @@
       <div class="mt-3">
         <calcite-label
           >Entidad
-          <calcite-select></calcite-select>
+          <calcite-select v-model="entidadSelected">
+            <calcite-option label="-- Seleccione --"></calcite-option>
+            <calcite-option
+              v-for="item in entidadesItems"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            ></calcite-option>
+          </calcite-select>
         </calcite-label>
       </div>
       <div class="mt-3">
         <calcite-label
           >Año
-          <calcite-select></calcite-select>
+          <calcite-select v-model="anioSelected">
+            <calcite-option label="-- Seleccione --"></calcite-option>
+            <calcite-option
+              v-for="item in anioItems"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            ></calcite-option>
+          </calcite-select>
         </calcite-label>
       </div>
       <div class="mt-3">
         <calcite-label
           >Estado
-          <calcite-select></calcite-select>
+          <calcite-select v-model="estadoSelected">
+            <calcite-option label="-- Seleccione --"></calcite-option>
+            <calcite-option
+              v-for="item in estadoItems"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            ></calcite-option>
+          </calcite-select>
         </calcite-label>
       </div>
     </div>
     <div class="mt-5">
-      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading"
+      <calcite-button
+        iconStart="search"
+        width="full"
+        @click="searchClick()"
+        :loading="loading"
         >Buscar</calcite-button
       >
     </div>
@@ -37,7 +65,7 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 import "@esri/calcite-components/dist/custom-elements/bundles/select";
 import "@esri/calcite-components/dist/custom-elements/bundles/switch";
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
-import Loader from '@/components/layouts/Loader.vue'
+import Loader from "@/components/layouts/Loader.vue";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
@@ -48,16 +76,23 @@ import API from "../../data/api";
 
 export default defineComponent({
   name: "ViewSICON",
-  components: {Loader},
+  components: { Loader },
   setup() {
     let app;
     let localidadGraphics = [];
     let layer;
+    let entidadesItems = [];
+    let anioItems = [];
+    let estadoItems = [];
+    let entidadSelected = null;
+    let anioSelected = null;
+    let estadoSelected = null;
     const loading = ref(false);
 
     onMounted(async () => {
       app = await import("../../data/map");
       generateQueryLocalidades();
+      populateCombo();
     });
 
     onUnmounted(() => {
@@ -66,6 +101,66 @@ export default defineComponent({
       }
     });
 
+    function populateCombo() {
+      var params = new FormData();
+      params.append("username", "leonardo.briceno@scrd.gov.co");
+      params.append("password", "ET65hG7iP5");
+      loading.value = true;
+      API({
+        method: "post",
+        url: "Intercambioinformacion/geo_sicon_propuestas",
+        data: params,
+      })
+        .then(function (response) {
+          loading.value = false;
+          for (let item of response.data) {
+            if (
+              entidadesItems.filter((row) => row.value === item.nombre_entidad)
+                .length === 0
+            ) {
+              entidadesItems.push({
+                value: item.nombre_entidad,
+                label: item.nombre_entidad,
+              });
+            }
+
+            if (
+              anioItems.filter((row) => row.value === item.anio).length === 0
+            ) {
+              anioItems.push({
+                value: item.anio,
+                label: item.anio.toString(),
+              });
+            }
+
+            if (
+              estadoItems.filter((row) => row.value === item.estado_propuesta)
+                .length === 0
+            ) {
+              estadoItems.push({
+                value: item.estado_propuesta,
+                label: item.estado_propuesta,
+              });
+            }
+          }
+
+          entidadesItems.push({
+            value: "IDARTES",
+            label: "IDARTES",
+          });
+
+          anioItems.push({
+            value: 2020,
+            label: "2020",
+          });
+        })
+        .catch(function (response) {
+          //handle error
+          loading.value = false;
+          console.log(response);
+        });
+    }
+
     function generateQueryLocalidades() {
       const queryParamas = new Query({
         outFields: ["*"],
@@ -73,10 +168,7 @@ export default defineComponent({
         where: "1=1",
       });
       query
-        .executeQueryJSON(
-          process.env.VUE_APP_URL_QUERYLOCALITIES,
-          queryParamas
-        )
+        .executeQueryJSON(process.env.VUE_APP_URL_QUERYLOCALITIES, queryParamas)
         .then((results) => {
           for (const feature of results.features) {
             const graphic = new Graphic({
@@ -92,10 +184,10 @@ export default defineComponent({
         });
     }
 
-    async function populateFeatureLayer(arr) {
+    async function populateFeatureLayer(arr, reangeArr) {
       for (let item of localidadGraphics) {
         const result = arr.filter(
-          (row) => row.codLocalidad === parseInt(item.attributes.codLocalidad)
+          (row) => row.codLocalidad === item.attributes.codLocalidad
         );
         if (result.length > 0) {
           item.attributes.count = result[0].count;
@@ -107,45 +199,37 @@ export default defineComponent({
         app.view.map.remove(layer);
       }
 
-      const less35 = {
-        type: "simple-fill", // autocasts as new SimpleFillSymbol()
-        color: "#fffcd4",
-        style: "solid",
-        outline: {
-          width: 0.2,
-          color: [255, 255, 255, 0.5],
-        },
-      };
+      const classBreakInfos = [];
+      const colors = [
+        { index: 0, color: [84, 10, 11, 0.85] },
+        { index: 1, color: [99, 68, 38, 0.85] },
+        { index: 2, color: [100, 100, 75, 0.85] },
+        { index: 3, color: [67, 87, 64, 0.85] },
+        { index: 4, color: [17, 51, 73, 0.85] },
+      ];
+      let index = 0;
+      for (const item of reangeArr) {
+        const color = colors.filter((item) => item.index === index)[0];
+        const symbol = {
+          type: "simple-fill",
+          color: color.color,
+          style: "solid",
+          outline: {
+            width: 0.2,
+            color: [255, 255, 255, 0.5],
+          },
+        };
 
-      const less50 = {
-        type: "simple-fill", // autocasts as new SimpleFillSymbol()
-        color: "#b1cdc2",
-        style: "solid",
-        outline: {
-          width: 0.2,
-          color: [255, 255, 255, 0.5],
-        },
-      };
+        const classBreakInfo = {
+          minValue: item.minValue,
+          maxValue: item.maxValue,
+          symbol: symbol,
+          label: item.minValue + " - " + item.maxValue,
+        };
 
-      const more50 = {
-        type: "simple-fill", // autocasts as new SimpleFillSymbol()
-        color: "#38627a",
-        style: "solid",
-        outline: {
-          width: 0.2,
-          color: [255, 255, 255, 0.5],
-        },
-      };
-
-      const more75 = {
-        type: "simple-fill", // autocasts as new SimpleFillSymbol()
-        color: "#0d2644",
-        style: "solid",
-        outline: {
-          width: 0.2,
-          color: [255, 255, 255, 0.5],
-        },
-      };
+        classBreakInfos.push(classBreakInfo);
+        index += 1;
+      }
 
       const renderer = {
         type: "class-breaks", // autocasts as new ClassBreaksRenderer()
@@ -163,32 +247,7 @@ export default defineComponent({
           },
         },
         defaultLabel: "Sin información",
-        classBreakInfos: [
-          {
-            minValue: 1,
-            maxValue: 25,
-            symbol: less35,
-            label: "1 - 25",
-          },
-          {
-            minValue: 26,
-            maxValue: 49,
-            symbol: less50,
-            label: "26 - 49",
-          },
-          {
-            minValue: 50,
-            maxValue: 74,
-            symbol: more50,
-            label: "50 - 74",
-          },
-          {
-            minValue: 75,
-            maxValue: 1000,
-            symbol: more75,
-            label: "> 75",
-          },
-        ],
+        classBreakInfos: classBreakInfos,
       };
 
       layer = new FeatureLayer({
@@ -210,12 +269,43 @@ export default defineComponent({
             alias: "Cantidad",
             type: "integer",
           },
+           {
+            name: "anio",
+            alias: "Año",
+            type: "integer",
+          },
         ],
         objectIdField: "codLocalidad",
         geometryType: "polygon",
+        popupTemplate: {
+          // autocasts as new PopupTemplate()
+          title: "{nombreLocalidad}",
+          content: [
+            { type: "text", text: "Cantidad de personas: {count}" },
+            {
+              type: "media",
+              mediaInfos: [
+                {
+                  title: "<b>Cantidad por Año</b>",
+                  type: "pie-chart",
+                  caption: "",
+                  value: {
+                    fields: ["count"],
+                    normalizeField: null,
+                    tooltipField: "nomLocalidad",
+                  },
+                },
+              ],
+            },
+          ],
+        },
       });
 
       app.view.map.add(layer);
+    }
+
+    function entidadSelectChange() {
+      console.log("OKKK");
     }
 
     function searchClick() {
@@ -225,6 +315,15 @@ export default defineComponent({
       params.append("entidad", "IDARTES");
       params.append("anio", "2020");
       params.append("estado", "Ganadora");
+      /* if (entidadSelected) {
+        params.append("entidad", entidadSelected);
+      }
+      if (anioSelected) {
+        params.append("anio", anioSelected);
+      }
+      if (estadoSelected) {
+        params.append("estado", estadoSelected);
+      }*/
       loading.value = true;
       API({
         method: "post",
@@ -234,20 +333,42 @@ export default defineComponent({
         .then(function (response) {
           loading.value = false;
           let arr = [];
+          let maxValue = 0;
+          let minValue = 10000;
           for (let item of response.data) {
             const result = arr.filter(
-              (row) => row.codLocalidad === item.localidad_ejecucion_cod
+              (row) =>
+                row.codLocalidad === item.localidad_ejecucion_cod &&
+                row.anio === item.anio
             );
             if (result.length > 0) {
               result[0].count += 1;
+              if (result[0].count > maxValue) {
+                maxValue = result[0].count;
+              }
+              if (result[0].count < minValue) {
+                minValue = result[0].count;
+              }
             } else {
               arr.push({
                 codLocalidad: item.localidad_ejecucion_cod,
+                anio: item.anio,
                 count: 1,
               });
             }
           }
-          populateFeatureLayer(arr);
+
+          const reangeArr = [];
+          const incr = Math.ceil((maxValue - minValue) / 4);
+          for (let index = minValue; index <= maxValue; index += incr) {
+            if (index + incr < maxValue) {
+              reangeArr.push({ minValue: index, maxValue: index + incr - 1 });
+            } else {
+              reangeArr.push({ minValue: index, maxValue: maxValue });
+            }
+          }
+
+          populateFeatureLayer(arr, reangeArr);
         })
         .catch(function (response) {
           //handle error
@@ -258,8 +379,15 @@ export default defineComponent({
 
     return {
       searchClick,
+      entidadSelectChange,
       localidadGraphics,
-      loading
+      loading,
+      entidadesItems,
+      entidadSelected,
+      anioItems,
+      anioSelected,
+      estadoItems,
+      estadoSelected,
     };
   },
 });
