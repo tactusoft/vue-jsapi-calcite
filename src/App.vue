@@ -21,7 +21,7 @@
   </calcite-shell>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, ref } from "vue";
 import "./assets/styles/styles.scss";
 import { commitAssetPath } from "@arcgis/core/widgets/support/componentsUtils";

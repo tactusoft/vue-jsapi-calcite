@@ -64,7 +64,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, ref } from "vue";
 import Category from "./menu/Category.vue";
 import List from "./menu/List.vue";

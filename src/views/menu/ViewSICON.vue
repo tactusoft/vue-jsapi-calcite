@@ -6,8 +6,8 @@
       <div class="mt-3">
         <calcite-label
           >Entidad
-          <calcite-select v-model="entidadSelected">
-            <calcite-option label="-- Seleccione --"></calcite-option>
+          <calcite-select ref="entidadSelected">
+            <calcite-option label="-- Seleccione --" selected value="0"></calcite-option>
             <calcite-option
               v-for="item in entidadesItems"
               :key="item.value"
@@ -20,8 +20,8 @@
       <div class="mt-3">
         <calcite-label
           >Año
-          <calcite-select v-model="anioSelected">
-            <calcite-option label="-- Seleccione --"></calcite-option>
+          <calcite-select ref="anioSelected">
+            <calcite-option label="-- Seleccione --" select value="0" ></calcite-option>
             <calcite-option
               v-for="item in anioItems"
               :key="item.value"
@@ -34,8 +34,8 @@
       <div class="mt-3">
         <calcite-label
           >Estado
-          <calcite-select v-model="estadoSelected">
-            <calcite-option label="-- Seleccione --"></calcite-option>
+          <calcite-select ref="estadoSelected">
+            <calcite-option label="-- Seleccione --" select value="0"></calcite-option>
             <calcite-option
               v-for="item in estadoItems"
               :key="item.value"
@@ -81,18 +81,21 @@ export default defineComponent({
     let app;
     let localidadGraphics = [];
     let layer;
-    let entidadesItems = [];
-    let anioItems = [];
-    let estadoItems = [];
-    let entidadSelected = null;
-    let anioSelected = null;
-    let estadoSelected = null;
+    let entidadesItems = ref([]);
+    let anioItems = ref([]);
+    let estadoItems = ref([]);
+    let entidadSelected = ref();
+    let anioSelected = ref();
+    let estadoSelected = ref();
     const loading = ref(false);
 
     onMounted(async () => {
       app = await import("../../data/map");
       generateQueryLocalidades();
       populateCombo();
+      window.addEventListener('calciteSelectChange', (e) => {
+        console.log(e.target.selectedOption.value)
+      })
     });
 
     onUnmounted(() => {
@@ -115,41 +118,41 @@ export default defineComponent({
           loading.value = false;
           for (let item of response.data) {
             if (
-              entidadesItems.filter((row) => row.value === item.nombre_entidad)
+              entidadesItems.value.filter((row) => row.value === item.nombre_entidad)
                 .length === 0
             ) {
-              entidadesItems.push({
+              entidadesItems.value.push({
                 value: item.nombre_entidad,
                 label: item.nombre_entidad,
               });
             }
 
             if (
-              anioItems.filter((row) => row.value === item.anio).length === 0
+              anioItems.value.filter((row) => row.value === item.anio).length === 0
             ) {
-              anioItems.push({
+              anioItems.value.push({
                 value: item.anio,
                 label: item.anio.toString(),
               });
             }
 
             if (
-              estadoItems.filter((row) => row.value === item.estado_propuesta)
+              estadoItems.value.filter((row) => row.value === item.estado_propuesta)
                 .length === 0
             ) {
-              estadoItems.push({
+              estadoItems.value.push({
                 value: item.estado_propuesta,
                 label: item.estado_propuesta,
               });
             }
           }
 
-          entidadesItems.push({
+          entidadesItems.value.push({
             value: "IDARTES",
             label: "IDARTES",
           });
 
-          anioItems.push({
+          anioItems.value.push({
             value: 2020,
             label: "2020",
           });
@@ -315,15 +318,9 @@ export default defineComponent({
       params.append("entidad", "IDARTES");
       params.append("anio", "2020");
       params.append("estado", "Ganadora");
-      /* if (entidadSelected) {
-        params.append("entidad", entidadSelected);
-      }
-      if (anioSelected) {
-        params.append("anio", anioSelected);
-      }
-      if (estadoSelected) {
-        params.append("estado", estadoSelected);
-      }*/
+      if (entidadSelected.value.selectedOption.value != 0) params.append("entidad", entidadSelected.value.selectedOption.value);
+      if (anioSelected.value.selectedOption.value != 0) params.append("anio", anioSelected.value.selectedOption.value);
+      if (estadoSelected.value.selectedOption.value != 0) params.append("estado", estadoSelected.value.selectedOption.value);
       loading.value = true;
       API({
         method: "post",
