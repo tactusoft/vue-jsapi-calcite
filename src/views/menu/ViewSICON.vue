@@ -1,7 +1,6 @@
 <template>
-  <div>
-    <Loader v-if="loading" menu />
-    <div v-else>
+    <div>
+    <Loader v-if="loading"  menu/>
       <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
       <div class="mt-3">
         <calcite-label
@@ -55,7 +54,6 @@
         >Buscar</calcite-button
       >
     </div>
-  </div>
 </template>
 
 <script>
