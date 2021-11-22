@@ -1,10 +1,10 @@
 @keyframes route-content {
-    from {
-      transform: translateX(-50px);
-      opacity: 0.3
-    }
-    to {
-      transform: translateY(0px);
-      opacity: 1;
-    }
+  from {
+    transform: translateX(-50px);
+    opacity: 0.3
   }
+  to {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
