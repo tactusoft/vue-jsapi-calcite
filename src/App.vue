@@ -26,7 +26,7 @@ import { defineComponent, ref } from "vue";
 import "./assets/styles/styles.scss";
 import { commitAssetPath } from "@arcgis/core/widgets/support/componentsUtils";
 import Header from "./components/layouts/Header.vue";
-import Menu from "./components/layouts/modals/Menu.vue";
+import Menu from "./components/layouts/modals/menu/Menu.vue";
 import Loader from "./components/layouts/Loader.vue";
 import WebMap from "./components/WebMap.vue";
 import Print from "./components/layouts/modals/Print.vue";

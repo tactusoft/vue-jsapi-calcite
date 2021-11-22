@@ -5,7 +5,7 @@
     <calcite-button round :color="color" disabled>
       <calcite-icon :icon="icon" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
-    <calcite-link class="mt"  @click="$emit('routing', route)">{{ text }}</calcite-link>
+    <calcite-link class="mt"  @click="$emit('routingMenu', menuName)">{{ text }}</calcite-link>
   </div>
 </template>
 
@@ -30,7 +30,7 @@ export default defineComponent({
       type: String,
       default: "Default text",
     },
-    route: {
+    menuName: {
       type: String,
     },
   },

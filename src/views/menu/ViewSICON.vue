@@ -1,50 +1,62 @@
 <template>
   <div>
     <Loader v-if="loading" menu />
-    <div v-else>
-      <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
-      <div class="mt-3">
-        <calcite-label
-          >Entidad
-          <calcite-select ref="entidadSelected">
-            <calcite-option label="-- Seleccione --" selected value="0"></calcite-option>
-            <calcite-option
-              v-for="item in entidadesItems"
-              :key="item.value"
-              :value="item.value"
-              :label="item.label"
-            ></calcite-option>
-          </calcite-select>
-        </calcite-label>
-      </div>
-      <div class="mt-3">
-        <calcite-label
-          >Año
-          <calcite-select ref="anioSelected">
-            <calcite-option label="-- Seleccione --" select value="0" ></calcite-option>
-            <calcite-option
-              v-for="item in anioItems"
-              :key="item.value"
-              :value="item.value"
-              :label="item.label"
-            ></calcite-option>
-          </calcite-select>
-        </calcite-label>
-      </div>
-      <div class="mt-3">
-        <calcite-label
-          >Estado
-          <calcite-select ref="estadoSelected">
-            <calcite-option label="-- Seleccione --" select value="0"></calcite-option>
-            <calcite-option
-              v-for="item in estadoItems"
-              :key="item.value"
-              :value="item.value"
-              :label="item.label"
-            ></calcite-option>
-          </calcite-select>
-        </calcite-label>
-      </div>
+    <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
+    <div class="mt-3">
+      <calcite-label
+        >Año *:
+        <calcite-select ref="anioSelected">
+          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option
+            v-for="item in anioItems"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label
+        >Entidad:
+        <calcite-select ref="entidadSelected">
+          <calcite-option label="-- Seleccione --" selected></calcite-option>
+          <calcite-option
+            v-for="item in entidadesItems"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label
+        >Estado de la propuesta:
+        <calcite-select ref="estadoSelected">
+          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option
+            v-for="item in estadoItems"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label
+        >Localidad:
+        <calcite-select ref="localidadSelected">
+          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option
+            v-for="item in localidadItems"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
     </div>
     <div class="mt-5">
       <calcite-button
@@ -71,8 +83,12 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
+import PopupTemplate from "@arcgis/core/PopupTemplate";
+
+import Chart from "chart.js/auto";
 
 import API from "../../data/api";
+import useColors from '@/utils/useColors'
 
 export default defineComponent({
   name: "ViewSICON",
@@ -80,22 +96,32 @@ export default defineComponent({
   setup() {
     let app;
     let localidadGraphics = [];
+    let mode;
+    let arrCharts = [];
+    let chartTitle;
     let layer;
     let entidadesItems = ref([]);
     let anioItems = ref([]);
     let estadoItems = ref([]);
+    let localidadItems = ref([]);
     let entidadSelected = ref();
     let anioSelected = ref();
     let estadoSelected = ref();
+    let localidadSelected = ref();
     const loading = ref(false);
+    const chartData = {
+      type: "doughnut",
+      data: {},
+    };
+    const color = useColors()
 
     onMounted(async () => {
       app = await import("../../data/map");
       generateQueryLocalidades();
       populateCombo();
-      window.addEventListener('calciteSelectChange', (e) => {
-        console.log(e.target.selectedOption.value)
-      })
+      window.addEventListener("calciteSelectChange", (e) => {
+        console.log(e.target.selectedOption.value);
+      });
     });
 
     onUnmounted(() => {
@@ -105,7 +131,7 @@ export default defineComponent({
     });
 
     function populateCombo() {
-      var params = new FormData();
+      const params = new FormData();
       params.append("username", "leonardo.briceno@scrd.gov.co");
       params.append("password", "ET65hG7iP5");
       loading.value = true;
@@ -118,8 +144,9 @@ export default defineComponent({
           loading.value = false;
           for (let item of response.data) {
             if (
-              entidadesItems.value.filter((row) => row.value === item.nombre_entidad)
-                .length === 0
+              entidadesItems.value.filter(
+                (row) => row.value === item.nombre_entidad
+              ).length === 0
             ) {
               entidadesItems.value.push({
                 value: item.nombre_entidad,
@@ -128,7 +155,8 @@ export default defineComponent({
             }
 
             if (
-              anioItems.value.filter((row) => row.value === item.anio).length === 0
+              anioItems.value.filter((row) => row.value === item.anio)
+                .length === 0
             ) {
               anioItems.value.push({
                 value: item.anio,
@@ -137,8 +165,9 @@ export default defineComponent({
             }
 
             if (
-              estadoItems.value.filter((row) => row.value === item.estado_propuesta)
-                .length === 0
+              estadoItems.value.filter(
+                (row) => row.value === item.estado_propuesta
+              ).length === 0
             ) {
               estadoItems.value.push({
                 value: item.estado_propuesta,
@@ -156,9 +185,18 @@ export default defineComponent({
             value: 2020,
             label: "2020",
           });
+
+          anioItems.value = anioItems.value.sort((a, b) =>
+            a.value < b.value ? -1 : 1
+          );
+          entidadesItems.value = entidadesItems.value.sort((a, b) =>
+            a.value < b.value ? -1 : 1
+          );
+          estadoItems.value = estadoItems.value.sort((a, b) =>
+            a.value < b.value ? -1 : 1
+          );
         })
         .catch(function (response) {
-          //handle error
           loading.value = false;
           console.log(response);
         });
@@ -183,6 +221,11 @@ export default defineComponent({
               },
             });
             localidadGraphics.push(graphic);
+
+            localidadItems.value.push({
+              value: feature.attributes.LOCCODIGO,
+              label: feature.attributes.LOCNOMBRE,
+            });
           }
         });
     }
@@ -194,7 +237,7 @@ export default defineComponent({
         );
         if (result.length > 0) {
           item.attributes.count = result[0].count;
-          console.log(item.attributes.count);
+          //console.log(item.attributes.count);
         }
       }
 
@@ -238,7 +281,7 @@ export default defineComponent({
         type: "class-breaks", // autocasts as new ClassBreaksRenderer()
         field: "count",
         legendOptions: {
-          title: "Cantidad de personas por localidad",
+          title: "Cantidad de propuestas por localidad",
         },
         defaultSymbol: {
           type: "simple-fill", // autocasts as new SimpleFillSymbol()
@@ -252,6 +295,11 @@ export default defineComponent({
         defaultLabel: "Sin información",
         classBreakInfos: classBreakInfos,
       };
+
+      let template = new PopupTemplate({
+        title: "Localidad: {nombreLocalidad} - Número de Personas: {count}",
+        content: setContentInfo,
+      });
 
       layer = new FeatureLayer({
         source: localidadGraphics,
@@ -272,7 +320,7 @@ export default defineComponent({
             alias: "Cantidad",
             type: "integer",
           },
-           {
+          {
             name: "anio",
             alias: "Año",
             type: "integer",
@@ -280,47 +328,63 @@ export default defineComponent({
         ],
         objectIdField: "codLocalidad",
         geometryType: "polygon",
-        popupTemplate: {
-          // autocasts as new PopupTemplate()
-          title: "{nombreLocalidad}",
-          content: [
-            { type: "text", text: "Cantidad de personas: {count}" },
-            {
-              type: "media",
-              mediaInfos: [
-                {
-                  title: "<b>Cantidad por Año</b>",
-                  type: "pie-chart",
-                  caption: "",
-                  value: {
-                    fields: ["count"],
-                    normalizeField: null,
-                    tooltipField: "nomLocalidad",
-                  },
-                },
-              ],
-            },
-          ],
-        },
+        popupTemplate: template,
       });
 
       app.view.map.add(layer);
     }
 
-    function entidadSelectChange() {
-      console.log("OKKK");
+    function setContentInfo(feature) {
+      let node = document.createElement("div");
+      let canvas = document.createElement("canvas");
+      node.appendChild(canvas);
+      setupDatasetCharts(feature);
+      new Chart(canvas, { ...chartData });
+      return node;
     }
 
     function searchClick() {
-      var params = new FormData();
+      app.view.popup.close();
+
+      arrCharts = [];
+      const params = new FormData();
       params.append("username", "leonardo.briceno@scrd.gov.co");
       params.append("password", "ET65hG7iP5");
-      params.append("entidad", "IDARTES");
-      params.append("anio", "2020");
-      params.append("estado", "Ganadora");
-      if (entidadSelected.value.selectedOption.value != 0) params.append("entidad", entidadSelected.value.selectedOption.value);
-      if (anioSelected.value.selectedOption.value != 0) params.append("anio", anioSelected.value.selectedOption.value);
-      if (estadoSelected.value.selectedOption.value != 0) params.append("estado", estadoSelected.value.selectedOption.value);
+
+      if (entidadSelected.value.selectedOption.value) {
+        params.append("entidad", entidadSelected.value.selectedOption.value);
+      }
+
+      if (anioSelected.value.selectedOption.value) {
+        params.append("anio", anioSelected.value.selectedOption.value);
+      }
+
+      if (estadoSelected.value.selectedOption.value) {
+        params.append("estado", estadoSelected.value.selectedOption.value);
+      }
+
+      if (localidadSelected.value.selectedOption.value) {
+        params.append(
+          "localidad_ejecucion_cod",
+          localidadSelected.value.selectedOption.value
+        );
+      }
+
+      if (
+        entidadSelected.value.selectedOption.value &&
+        anioSelected.value.selectedOption.value &&
+        estadoSelected.value.selectedOption.value
+      ) {
+        mode = "convocatoria";
+        chartTitle = "Por Convocatoria";
+      } else if (!entidadSelected.value.selectedOption.value) {
+        mode = "entidad";
+        chartTitle = "Por Entidad";
+      } else if (!estadoSelected.value.selectedOption.value) {
+        mode = "estado";
+        chartTitle = "Por Estado";
+      }
+
       loading.value = true;
       API({
         method: "post",
@@ -338,6 +402,9 @@ export default defineComponent({
                 row.codLocalidad === item.localidad_ejecucion_cod &&
                 row.anio === item.anio
             );
+
+            populateArrCharts(item);
+
             if (result.length > 0) {
               result[0].count += 1;
               if (result[0].count > maxValue) {
@@ -374,9 +441,102 @@ export default defineComponent({
         });
     }
 
+    function populateArrCharts(item) {
+      let result;
+      switch (mode) {
+        case "convocatoria":
+          result = arrCharts.filter(
+            (row) =>
+              row.codLocalidad === item.localidad_ejecucion_cod &&
+              row.convocatoria === item.convocatoria
+          );
+          if (result.length === 0) {
+            arrCharts.push({
+              codLocalidad: item.localidad_ejecucion_cod,
+              convocatoria: item.convocatoria,
+              count: 1,
+            });
+          }
+          break;
+        case "entidad":
+          result = arrCharts.filter(
+            (row) =>
+              row.codLocalidad === item.localidad_ejecucion_cod &&
+              row.entidad === item.entidad
+          );
+          if (result.length === 0) {
+            arrCharts.push({
+              codLocalidad: item.localidad_ejecucion_cod,
+              entidad: item.nombre_entidad,
+              count: 1,
+            });
+          }
+          break;
+        case "estado":
+          result = arrCharts.filter(
+            (row) =>
+              row.codLocalidad === item.localidad_ejecucion_cod &&
+              row.estado === item.estado
+          );
+          if (result.length === 0) {
+            arrCharts.push({
+              codLocalidad: item.localidad_ejecucion_cod,
+              estado: item.estado_propuesta,
+              count: 1,
+            });
+          }
+          break;
+      }
+
+      if (result.length > 0) {
+        result[0].count += 1;
+      }
+    }
+
+    function setupDatasetCharts(feature) {
+      const arrChartsByLocalidad = arrCharts.filter(
+        (row) => row.codLocalidad === feature.graphic.attributes.codLocalidad
+      );
+
+      let arr = [];
+      let labels = [];
+      for (let item of arrChartsByLocalidad) {
+        const result = arr.filter((row) => row.title === item[mode]);
+
+        if (result.length > 0) {
+          result[0].sum += item.count;
+        } else {
+          labels.push(item[mode]);
+          arr.push({
+            title: item[mode],
+            sum: item.count,
+          });
+        }
+      }
+
+      chartData.options = {
+        responsive: true,
+        parsing: {
+          key: "sum",
+        },
+      };
+
+      const dataLength = arr.length;
+
+      const COLORS = color.interpolateColors(dataLength);
+
+      const dataset = {
+        label: chartTitle,
+        data: arr,
+        backgroundColor: COLORS,
+        hoverBackgroundColor: COLORS,
+      };
+      chartData.data.labels = labels;
+      chartData.data.datasets = [dataset];
+    }
+
     return {
       searchClick,
-      entidadSelectChange,
       localidadGraphics,
       loading,
       entidadesItems,
@@ -385,6 +545,8 @@ export default defineComponent({
       anioSelected,
       estadoItems,
       estadoSelected,
+      localidadItems,
+      localidadSelected,
     };
   },
 });
