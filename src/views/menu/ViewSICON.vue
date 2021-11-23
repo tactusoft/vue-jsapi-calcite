@@ -4,9 +4,9 @@
     <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
     <div class="mt-3">
       <calcite-label
-        >Año *:
+        >Año *
         <calcite-select ref="anioSelected">
-          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option label="-- Seleccione --" select disabled></calcite-option>
           <calcite-option
             v-for="item in anioItems"
             :key="item.value"
@@ -18,9 +18,9 @@
     </div>
     <div class="mt-3">
       <calcite-label
-        >Entidad:
+        >Entidad *
         <calcite-select ref="entidadSelected">
-          <calcite-option label="-- Seleccione --" selected></calcite-option>
+          <calcite-option label="-- Seleccione --" selected disabled></calcite-option>
           <calcite-option
             v-for="item in entidadesItems"
             :key="item.value"
@@ -32,9 +32,9 @@
     </div>
     <div class="mt-3">
       <calcite-label
-        >Estado de la propuesta:
+        >Estado de la propuesta *
         <calcite-select ref="estadoSelected">
-          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option label="-- Seleccione --" select disabled></calcite-option>
           <calcite-option
             v-for="item in estadoItems"
             :key="item.value"
@@ -46,14 +46,46 @@
     </div>
     <div class="mt-3">
       <calcite-label
-        >Localidad:
+        >Localidad *
         <calcite-select ref="localidadSelected">
-          <calcite-option label="-- Seleccione --" select></calcite-option>
+          <calcite-option label="-- Seleccione --" select disabled></calcite-option>
           <calcite-option
             v-for="item in localidadItems"
             :key="item.value"
             :value="item.value"
             :label="item.label"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label
+        >ZUP *
+        <calcite-select ref="zupSelected" :disabled="zupActive">
+          <calcite-option label="-- Seleccione --" select disabled></calcite-option>
+          <calcite-option
+            value="Item 1"
+            label="Item 1"
+          ></calcite-option>
+          <calcite-option
+            value="Item 2"
+            label="Item 2"
+          ></calcite-option>
+        </calcite-select>
+      </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label
+        >Barrio *
+        <calcite-select ref="barrioSelected" :disabled="barrioActive">
+          <calcite-option label="-- Seleccione --" select disabled></calcite-option>
+          <calcite-option
+            value="Item 1"
+            label="Item 1"
+          ></calcite-option>
+          <calcite-option
+            value="Item 2"
+            label="Item 2"
           ></calcite-option>
         </calcite-select>
       </calcite-label>
@@ -88,6 +120,7 @@ import PopupTemplate from "@arcgis/core/PopupTemplate";
 import Chart from "chart.js/auto";
 
 import API from "../../data/api";
+import axios from 'axios';
 import useColors from '@/utils/useColors'
 
 export default defineComponent({
@@ -100,14 +133,23 @@ export default defineComponent({
     let arrCharts = [];
     let chartTitle;
     let layer;
+    // --- Options for Selects --- //
     let entidadesItems = ref([]);
     let anioItems = ref([]);
     let estadoItems = ref([]);
     let localidadItems = ref([]);
+
+
     let entidadSelected = ref();
     let anioSelected = ref();
     let estadoSelected = ref();
     let localidadSelected = ref();
+    let zupSelected = ref();
+
+    let zupActive = ref(true);
+    let barrioActive = ref(true);
+
+
     const loading = ref(false);
     const chartData = {
       type: "doughnut",
@@ -119,9 +161,8 @@ export default defineComponent({
       app = await import("../../data/map");
       generateQueryLocalidades();
       populateCombo();
-      window.addEventListener("calciteSelectChange", (e) => {
-        console.log(e.target.selectedOption.value);
-      });
+      localidadSelected.value.addEventListener("calciteSelectChange", () => zupActive.value = false);
+      zupSelected.value.addEventListener("calciteSelectChange", () => barrioActive.value = false);
     });
 
     onUnmounted(() => {
@@ -130,76 +171,51 @@ export default defineComponent({
       }
     });
 
-    function populateCombo() {
-      const params = new FormData();
-      params.append("username", "leonardo.briceno@scrd.gov.co");
-      params.append("password", "ET65hG7iP5");
-      loading.value = true;
-      API({
-        method: "post",
-        url: "Intercambioinformacion/geo_sicon_propuestas",
-        data: params,
-      })
-        .then(function (response) {
-          loading.value = false;
-          for (let item of response.data) {
-            if (
-              entidadesItems.value.filter(
-                (row) => row.value === item.nombre_entidad
-              ).length === 0
-            ) {
-              entidadesItems.value.push({
-                value: item.nombre_entidad,
-                label: item.nombre_entidad,
-              });
-            }
-
-            if (
-              anioItems.value.filter((row) => row.value === item.anio)
-                .length === 0
-            ) {
-              anioItems.value.push({
-                value: item.anio,
-                label: item.anio.toString(),
-              });
-            }
-
-            if (
-              estadoItems.value.filter(
-                (row) => row.value === item.estado_propuesta
-              ).length === 0
-            ) {
-              estadoItems.value.push({
-                value: item.estado_propuesta,
-                label: item.estado_propuesta,
-              });
-            }
-          }
-
-          entidadesItems.value.push({
-            value: "IDARTES",
-            label: "IDARTES",
-          });
-
-          anioItems.value.push({
-            value: 2020,
-            label: "2020",
-          });
-
-          anioItems.value = anioItems.value.sort((a, b) =>
-            a.value < b.value ? -1 : 1
-          );
-          entidadesItems.value = entidadesItems.value.sort((a, b) =>
-            a.value < b.value ? -1 : 1
-          );
-          estadoItems.value = estadoItems.value.sort((a, b) =>
-            a.value < b.value ? -1 : 1
-          );
-        })
-        .catch(function (response) {
-          loading.value = false;
-          console.log(response);
+    function setYearsUntilCurrent() {
+      const from = 2020;
+      const currentYear = new Date().getFullYear();
+      for (let year = from; year <= currentYear; year++) {
+        anioItems.value.push({
+                value: year,
+                label: year.toString(),
         });
+      }
+    }
+
+    async function setEstado() {
+      try{
+        const { data: estados } = await API.getParam('38');
+        estados.map((estado) => {
+          estadoItems.value.push({
+              value: estado.detalle,
+              label: estado.detalle,
+          });
+        })
+      }catch(e){
+        console.log(e)
+      }
+    }
+
+    async function setEntidad() {
+      try{
+        const { data: entidades } = await API.getParam('9');
+        entidades.map((entidad) => {
+          entidadesItems.value.push({
+              value: entidad.detalle,
+              label: entidad.detalle,
+          });
+        })
+      }catch(e){
+        console.log(e)
+      }
+    }
+
+    async function populateCombo() {
+      loading.value = true;
+      setYearsUntilCurrent();
+      await setEstado();
+      await setEntidad();
+      loading.value = false;
     }
 
     function generateQueryLocalidades() {
@@ -386,9 +402,9 @@ export default defineComponent({
       }
 
       loading.value = true;
-      API({
+      axios({
         method: "post",
-        url: "Intercambioinformacion/geo_sicon_propuestas",
+        url: "http://sis.scrd.gov.co/crud_SCRD_pv/api/Intercambioinformacion/geo_sicon_propuestas",
         data: params,
       })
         .then(function (response) {
@@ -547,6 +563,9 @@ export default defineComponent({
       estadoSelected,
       localidadItems,
       localidadSelected,
+      zupSelected,
+      zupActive,
+      barrioActive
     };
   },
 });

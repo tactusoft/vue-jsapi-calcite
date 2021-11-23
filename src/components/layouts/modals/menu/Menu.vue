@@ -1,7 +1,6 @@
 <template>
   <div class="menu" :class="show ? 'is-active' : ''">
     <!-- Hamburger button -->
-
     <calcite-button class="menu__button menu__button--toggle" @click="$emit('toggleShowMenu')">
       <calcite-icon icon="hamburger" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>

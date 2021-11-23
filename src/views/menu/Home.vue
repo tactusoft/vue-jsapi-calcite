@@ -2,15 +2,15 @@
     <div class="menu__content__category">
         <h2 class="menu__title">Categorías</h2>
         <div class="flex flex--justify-content-space-around mt">
-            <Category :color="currentMenu === 'SICON' ? 'blue' : 'inverse' " icon="beaker" text="SICON" menuName="SICON" @routingMenu="menuHandler($event)" />
-            <Category :color="currentMenu === 'Bibliotecas' ? 'blue' : 'inverse' " icon="check-shield" text="Bibliotecas" menuName="Bibliotecas" @routingMenu="menuHandler($event)" />
-            <Category :color="currentMenu === 'Checking' ? 'blue' : 'inverse' " icon="analysis" text="SISBIC" menuName="Checking" @routingMenu="menuHandler($event)" />
+            <Category :color="currentMenuName === 'SICON' ? 'blue' : 'inverse' " icon="beaker" text="SICON" menuName="SICON" @routingMenu="menuHandler($event)" />
+            <Category :color="currentMenuName === 'Bibliotecas' ? 'blue' : 'inverse' " icon="check-shield" text="Bibliotecas" menuName="Bibliotecas" @routingMenu="menuHandler($event)" />
+            <Category :color="currentMenuName === 'Checking' ? 'blue' : 'inverse' " icon="analysis" text="SISBIC" menuName="Checking" @routingMenu="menuHandler($event)" />
         </div>
     </div>
     <div class="menu__content__list">
-        <SubMenu @routing="routingHandler($event)" v-if="currentMenu === 'SICON'" :subMenu="SICONSubMenu" />
-        <SubMenu @routing="routingHandler($event)" v-if="currentMenu === 'Bibliotecas'" :subMenu="SubMenu1" />
-        <SubMenu @routing="routingHandler($event)" v-if="currentMenu === 'Checking'" :subMenu="SubMenu2" />
+        <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'SICON'" :subMenu="SICONSubMenu" />
+        <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'Bibliotecas'" :subMenu="SubMenu1" />
+        <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'Checking'" :subMenu="SubMenu2" />
     </div>
 </template>
 
@@ -45,13 +45,13 @@ export default defineComponent({
       route: 'mountain'
     }
     ];
-        const currentMenu = ref('SICON');
+        const currentMenuName = ref('SICON');
 
         const routingHandler = (route) => emit('routing', route)
         
-        const menuHandler = (menu) => currentMenu.value = menu;
+        const menuHandler = (menu) => currentMenuName.value = menu;
 
-        return {routingHandler, currentMenu, menuHandler, SICONSubMenu, SubMenu1, SubMenu2}
+        return {routingHandler, currentMenuName, menuHandler, SICONSubMenu, SubMenu1, SubMenu2}
     }
 })
 </script>
