@@ -47,7 +47,7 @@ import useColors from "@/utils/useColors";
 export default defineComponent({
   name: "ViewSISBIC",
   components: { Loader },
-  setup() {
+  setup(_, {emit}) {
     let app;
     let localidadGraphics = [];
     let upzGraphics = [];
@@ -498,6 +498,8 @@ export default defineComponent({
         outFields: ["*"],
         where: "BARMANPRE='" + lotcodigo + "'",
       });
+      // -- Este emit no iría acá, iría en la linea 540 --
+      emit('changeToBuscarMapaView', [])
       query
         .executeQueryJSON(
           "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/3",
@@ -512,6 +514,7 @@ export default defineComponent({
     }
 
     function generateQueryBuscarChip(chip) {
+      let data = [];
       loading.value = false;
       // GABI si buscas este chip AAA0055DUEP trae multiples resultados
       axios({
@@ -526,7 +529,7 @@ export default defineComponent({
             })
               .then(function (responseDetail) {
                 for (let itemDetail of responseDetail.data) {
-                  console.log(itemDetail);
+                  data.push(itemDetail)
                 }
               })
               .catch(function (response) {
@@ -534,6 +537,7 @@ export default defineComponent({
                 console.log(response);
               });
           }
+        //este emit si iría aquí: emit('changeToBuscarMapaView', data)  
         })
         .catch(function (response) {
           loading.value = false;

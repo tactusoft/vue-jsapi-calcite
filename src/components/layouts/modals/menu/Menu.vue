@@ -40,7 +40,10 @@
         <ViewSICON />
       </div>
       <div v-if="currentView === 'SISBIC1'" class="route-content">
-        <ViewSISBIC />
+        <ViewSISBIC @changeToBuscarMapaView="changeToBuscarMapaView($event)" />
+      </div>
+      <div v-if="currentView === 'PorMapa'" class="route-content">
+        <ViewBuscarPorMapa :data="dataBuscarPorMapa"/>
       </div>
     </div>
   </div>
@@ -52,6 +55,8 @@ import { defineComponent, ref } from "vue";
 import Home from "../../../../views/menu/Home.vue";
 import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
+import ViewBuscarPorMapa from "../../../../views/menu/ViewBuscarPorMapa.vue";
+
 
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
 import "@esri/calcite-components/dist/custom-elements/bundles/icon";
@@ -59,7 +64,7 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC },
+  components: { ViewSICON, Home, ViewSISBIC, ViewBuscarPorMapa },
   emits: ["routing"],
   props: {
     show: {
@@ -70,15 +75,18 @@ export default defineComponent({
   setup() {
     const currentView = ref("home");
 
-    const routingHandler = (route) => {
-      currentView.value = route;
-    };
+    const routingHandler = (route) => currentView.value = route;
 
-    const goBackHandler = () => {
-      currentView.value = "home";
-    };
+    const goBackHandler = () => currentView.value = "home";
+    const dataBuscarPorMapa = ref();
+    const changeToBuscarMapaView = (data) => {
+      //Aquí iría igualado a la variable data
+      dataBuscarPorMapa.value = {nombre: 'Jesús', apellido: 'Ahumada '}
+      console.log(data);
+      currentView.value = 'PorMapa';
+    }
 
-    return { currentView, routingHandler, goBackHandler };
+    return { currentView, routingHandler, goBackHandler, changeToBuscarMapaView, dataBuscarPorMapa };
   },
 });
 </script>
