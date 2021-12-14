@@ -36,6 +36,7 @@ import Graphic from "@arcgis/core/Graphic";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
+import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 
 import Chart from "chart.js/auto";
 
@@ -55,6 +56,7 @@ export default defineComponent({
     let chartTitle;
     let layer;
     let graphicsLayer;
+    let bienesLayer;
 
     // --- Options for Selects --- //
     let entidadesItems = ref([]);
@@ -83,12 +85,176 @@ export default defineComponent({
       app = await import("../../data/map");
       graphicsLayer = new GraphicsLayer();
       app.view.map.add(graphicsLayer);
+
+      bienesLayer = new MapImageLayer({
+        url: "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/bienesinterescultural/MapServer",
+        sublayers: [
+          {
+            id: 0,
+            visible: true,
+            popupTemplate: {
+              title: "{TITULO_NOM}",
+              actions: [
+                {
+                  id: "action-detail",
+                  title: "Detalle",
+                },
+              ],
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRECCION",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "LOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "UPLNOMBRE",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "SECTOR_CAT",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "LOT_COD",
+                      label: "Código de Lote",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            id: 1,
+            visible: true,
+            popupTemplate: {
+              title: "{NOMBIC}",
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRBIC",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "ACTADMBIC",
+                      label: "Acto Administrativo BIC",
+                    },
+                    {
+                      fieldName: "AMBITOBIC",
+                      label: "Ámbito BIC",
+                    },
+                    {
+                      fieldName: "CATEGORIA",
+                      label: "Categoría BIC fuera del Centro Histórico",
+                    },
+                    {
+                      fieldName: "NOMSIC",
+                      label: "Nombre del Sector de Interés Cultural",
+                    },
+                    {
+                      fieldName: "NOMLOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "NOMUPZ",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "NOMSECTCAT",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "CODLOTE",
+                      label: "Código de Lote",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            id: 4,
+            visible: true,
+            popupTemplate: {
+              title: "{NOMBRE}",
+              actions: [
+                {
+                  id: "action-detail",
+                  title: "Detalle",
+                },
+              ],
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRECCION_DECLARATORIA",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "ACTO_ADMIN",
+                      label: "Acto Administrativo BIC",
+                    },
+                    {
+                      fieldName: "AMBITO",
+                      label: "Ámbito BIC",
+                    },
+                    {
+                      fieldName: "CATEGORIABICNOPEMP",
+                      label: "Categoría BIC fuera del Centro Histórico",
+                    },
+                    {
+                      fieldName: "SIC",
+                      label: "Nombre del Sector de Interés Cultural",
+                    },
+                    {
+                      fieldName: "LOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "UPZ",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "SECTOR_CATASTRAL",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "CODIGO_LOTE",
+                      label: "Código de Lote",
+                    },
+                    {
+                      fieldName: "OBSERVACION",
+                      label: "Observación",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      });
+      app.view.map.add(bienesLayer);
+      const popup = app.view.popup;
+      popup.viewModel.on("trigger-action", (event) => {
+        if (event.action.id === "action-detail") {
+          loading.value = true;
+          const attributes = popup.viewModel.selectedFeature.attributes;
+          generateQueryLotebyCodigoLote(attributes.LOT_COD);
+        }
+      });
     });
 
     onUnmounted(() => {
-      if (graphicsLayer) {
-        app.view.map.remove(graphicsLayer);
-      }
+      app.view.map.remove(graphicsLayer);
+      app.view.map.remove(bienesLayer);
     });
 
     async function populateFeatureLayer(arr, reangeArr) {
@@ -323,6 +489,55 @@ export default defineComponent({
           for (const feature of results.features) {
             generateQueryPredio(feature.attributes.BARMANPRE);
           }
+        });
+    }
+
+    function generateQueryLotebyCodigoLote(lotcodigo) {
+      loading.value = true;
+      const queryParamas = new Query({
+        outFields: ["*"],
+        where: "BARMANPRE='" + lotcodigo + "'",
+      });
+      query
+        .executeQueryJSON(
+          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/3",
+          queryParamas
+        )
+        .then((results) => {
+          for (const feature of results.features) {
+            generateQueryBuscarChip(feature.attributes.PRECHIP);
+            break;
+          }
+        });
+    }
+
+    function generateQueryBuscarChip(chip) {
+      loading.value = false;
+      // GABI si buscas este chip AAA0055DUEP trae multiples resultados
+      axios({
+        method: "get",
+        url: "https://sisbic.idpc.gov.co/api/buscar_chip/" + chip,
+      })
+        .then(function (response) {
+          for (let item of response.data) {
+            axios({
+              method: "get",
+              url: "https://sisbic.idpc.gov.co/api/inmuebletotal/" + item.id,
+            })
+              .then(function (responseDetail) {
+                for (let itemDetail of responseDetail.data) {
+                  console.log(itemDetail);
+                }
+              })
+              .catch(function (response) {
+                loading.value = false;
+                console.log(response);
+              });
+          }
+        })
+        .catch(function (response) {
+          loading.value = false;
+          console.log(response);
         });
     }
 
