@@ -2,10 +2,11 @@
   "name": "geoportal",
   "version": "0.1.0",
   "private": true,
+  "main": "dist/index.html",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "./node_modules/.bin/vue-cli-service serve",
+    "build": "./node_modules/.bin/vue-cli-service build",
+    "lint": "./node_modules/.bin/vue-cli-service lint"
   },
   "dependencies": {
     "@arcgis/core": "~4.20.1",
@@ -15,7 +16,20 @@
     "d3-scale-chromatic": "^3.0.0",
     "interactjs": "^1.10.11",
     "vue": "^3.0.0",
-    "vue3-moveable": "^0.1.0"
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "vue3-moveable": "^0.1.0",
+    "copy-webpack-plugin": "^6.4.1",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "ncp": "^2.0.0",
+    "resolve-url-loader": "^4.0.0",
+    "sass": "^1.35.1",
+    "sass-loader": "^10.2.0",
+    "vue-loader": "^15.9.8",
+    "vue-template-compiler": "^2.6.14"
   },
   "devDependencies": {
     "@stencil/webpack": "0.0.6",

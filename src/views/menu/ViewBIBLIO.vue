@@ -1,92 +1,14 @@
 <template>
   <div>
     <Loader v-if="loading" menu />
-    <h2 class="menu__title">Sistema de Convocatorias (SICON)</h2>
-    <h3 >Búsqueda por Propuestas</h3>
+    <h2 class="menu__title">IDPC</h2>
+    <h3>Búsqueda por CHIP</h3>
     <div class="mt-3">
       <calcite-label
-        >Año *
-        <calcite-select ref="anioSelected">
-          <calcite-option
-            label="-- Seleccione --"
-            selected
-            disabled
-          ></calcite-option>
-          <calcite-option
-            v-for="item in anioItems"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          ></calcite-option>
-        </calcite-select>
+        >Digite el CHIP *
+        <calcite-input></calcite-input>
       </calcite-label>
     </div>
-    <div class="mt-3">
-      <calcite-label
-        >Entidad *
-        <calcite-select ref="entidadSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
-          <calcite-option
-            v-for="item in entidadesItems"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          ></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
-      <calcite-label
-        >Estado de la propuesta *
-        <calcite-select ref="estadoSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
-          <calcite-option
-            v-for="item in estadoItems"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          ></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
-      <calcite-label
-        >Localidad
-        <calcite-select ref="localidadSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
-          <calcite-option
-            v-for="item in localidadItems"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          ></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>
-    <!-- <div class="mt-3">
-      <calcite-label
-        >UPZ
-        <calcite-select ref="upzSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
-          <calcite-option
-            v-for="item in upzItems"
-            :key="item.value"
-            :value="item.value"
-            :label="item.label"
-          ></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
-      <calcite-label
-        >Barrio
-        <calcite-select ref="barrioSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
-          <calcite-option value="Item 1" label="Item 1"></calcite-option>
-          <calcite-option value="Item 2" label="Item 2"></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>-->
     <div class="mt-5">
       <calcite-button
         iconStart="search"
@@ -109,21 +31,23 @@ import "@esri/calcite-components/dist/custom-elements/bundles/button";
 import Loader from "@/components/layouts/Loader.vue";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import Graphic from "@arcgis/core/Graphic";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
+import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 
 import Chart from "chart.js/auto";
 
-import API from "../../data/api";
+//import API from "../../data/api";
 import axios from "axios";
 import useColors from "@/utils/useColors";
 
 export default defineComponent({
-  name: "ViewSICON",
+  name: "ViewSISBIC",
   components: { Loader },
-  setup() {
+  setup(_, { emit }) {
     let app;
     let localidadGraphics = [];
     let upzGraphics = [];
@@ -131,6 +55,8 @@ export default defineComponent({
     let arrCharts = [];
     let chartTitle;
     let layer;
+    let graphicsLayer;
+    let bienesLayer;
 
     // --- Options for Selects --- //
     let entidadesItems = ref([]);
@@ -157,136 +83,179 @@ export default defineComponent({
 
     onMounted(async () => {
       app = await import("../../data/map");
-      generateQueryLocalidades();
-      populateCombo();
-      localidadSelected.value.addEventListener("calciteSelectChange", () =>
-        generateQueryUPZ()
-      );
-      /* upzSelected.value.addEventListener(
-        "calciteSelectChange",
-        () => (barrioActive.value = false)
-      );*/
+      graphicsLayer = new GraphicsLayer();
+      app.view.map.add(graphicsLayer);
+
+      bienesLayer = new MapImageLayer({
+        url: "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/bienesinterescultural/MapServer",
+        sublayers: [
+          {
+            id: 0,
+            visible: true,
+            popupTemplate: {
+              title: "{TITULO_NOM}",
+              actions: [
+                {
+                  id: "action-detail",
+                  title: "Detalle",
+                },
+              ],
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRECCION",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "LOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "UPLNOMBRE",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "SECTOR_CAT",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "LOT_COD",
+                      label: "Código de Lote",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            id: 1,
+            visible: true,
+            popupTemplate: {
+              title: "{NOMBIC}",
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRBIC",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "ACTADMBIC",
+                      label: "Acto Administrativo BIC",
+                    },
+                    {
+                      fieldName: "AMBITOBIC",
+                      label: "Ámbito BIC",
+                    },
+                    {
+                      fieldName: "CATEGORIA",
+                      label: "Categoría BIC fuera del Centro Histórico",
+                    },
+                    {
+                      fieldName: "NOMSIC",
+                      label: "Nombre del Sector de Interés Cultural",
+                    },
+                    {
+                      fieldName: "NOMLOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "NOMUPZ",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "NOMSECTCAT",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "CODLOTE",
+                      label: "Código de Lote",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          {
+            id: 4,
+            visible: true,
+            popupTemplate: {
+              title: "{NOMBRE}",
+              actions: [
+                {
+                  id: "action-detail",
+                  title: "Detalle",
+                },
+              ],
+              content: [
+                {
+                  type: "fields",
+                  fieldInfos: [
+                    {
+                      fieldName: "DIRECCION_DECLARATORIA",
+                      label: "Dirección BIC",
+                    },
+                    {
+                      fieldName: "ACTO_ADMIN",
+                      label: "Acto Administrativo BIC",
+                    },
+                    {
+                      fieldName: "AMBITO",
+                      label: "Ámbito BIC",
+                    },
+                    {
+                      fieldName: "CATEGORIABICNOPEMP",
+                      label: "Categoría BIC fuera del Centro Histórico",
+                    },
+                    {
+                      fieldName: "SIC",
+                      label: "Nombre del Sector de Interés Cultural",
+                    },
+                    {
+                      fieldName: "LOCALIDAD",
+                      label: "Nombre de la Localidad",
+                    },
+                    {
+                      fieldName: "UPZ",
+                      label: "UPZ",
+                    },
+                    {
+                      fieldName: "SECTOR_CATASTRAL",
+                      label: "Sector Catastral",
+                    },
+                    {
+                      fieldName: "CODIGO_LOTE",
+                      label: "Código de Lote",
+                    },
+                    {
+                      fieldName: "OBSERVACION",
+                      label: "Observación",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+        ],
+      });
+      app.view.map.add(bienesLayer);
+      const popup = app.view.popup;
+      popup.viewModel.on("trigger-action", (event) => {
+        if (event.action.id === "action-detail") {
+          loading.value = true;
+          const attributes = popup.viewModel.selectedFeature.attributes;
+          generateQueryLotebyCodigoLote(attributes.LOT_COD);
+        }
+      });
     });
 
     onUnmounted(() => {
-      if (layer) {
-        app.view.map.remove(layer);
-      }
+      app.view.map.remove(graphicsLayer);
+      //app.view.map.remove(bienesLayer);
     });
-
-    function setYearsUntilCurrent() {
-      const from = 2020;
-      const currentYear = new Date().getFullYear();
-      for (let year = from; year <= currentYear; year++) {
-        anioItems.value.push({
-          value: year,
-          label: year.toString(),
-        });
-      }
-    }
-
-    async function setEstado() {
-      try {
-        const { data: estados } = await API.getParam("38");
-        estados.map((estado) => {
-          estadoItems.value.push({
-            value: estado.detalle,
-            label: estado.detalle,
-          });
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    async function setEntidad() {
-      try {
-        const { data: entidades } = await API.getParam("9");
-        entidades.map((entidad) => {
-          entidadesItems.value.push({
-            value: entidad.detalle,
-            label: entidad.detalle,
-          });
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    async function populateCombo() {
-      loading.value = true;
-      setYearsUntilCurrent();
-      await setEstado();
-      await setEntidad();
-      loading.value = false;
-    }
-
-    function generateQueryLocalidades() {
-      const queryParamas = new Query({
-        outFields: ["*"],
-        returnGeometry: true,
-        where: "1=1",
-      });
-      query
-        .executeQueryJSON(process.env.VUE_APP_URL_QUERYLOCALITIES, queryParamas)
-        .then((results) => {
-          for (const feature of results.features) {
-            const graphic = new Graphic({
-              geometry: feature.geometry,
-              attributes: {
-                codLocalidad: feature.attributes.LOCCODIGO,
-                nombreLocalidad: feature.attributes.LOCNOMBRE,
-                count: 0,
-              },
-            });
-            localidadGraphics.push(graphic);
-
-            localidadItems.value.push({
-              value: feature.attributes.LOCCODIGO,
-              label: feature.attributes.LOCNOMBRE,
-            });
-          }
-        });
-    }
-
-    function generateQueryUPZ() {
-      upzItems = ref([]);
-      upzGraphics = [];
-
-      const localidadGraphicSelected = localidadGraphics.find(
-        (graphic) =>
-          graphic.attributes.codLocalidad ===
-          localidadSelected.value.selectedOption.value
-      );
-
-      app.view.goTo(localidadGraphicSelected);
-
-      const queryParamas = new Query({
-        outFields: ["*"],
-        returnGeometry: true,
-        geometry: localidadGraphicSelected.geometry,
-      });
-      query
-        .executeQueryJSON(process.env.VUE_APP_URL_QUERY_UPZ, queryParamas)
-        .then((results) => {
-          for (const feature of results.features) {
-            const graphic = new Graphic({
-              geometry: feature.geometry,
-              attributes: {
-                codUPZ: feature.attributes.CODIGO_UPZ,
-                nombreUPZ: feature.attributes.NOMBRE,
-                count: 0,
-              },
-            });
-            upzGraphics.push(graphic);
-
-            upzItems.value.push({
-              value: feature.attributes.CODIGO_UPZ,
-              label: feature.attributes.NOMBRE,
-            });
-          }
-        });
-    }
 
     async function populateFeatureLayer(arr, reangeArr) {
       for (let item of localidadGraphics) {
@@ -505,8 +474,121 @@ export default defineComponent({
       return node;
     }
 
+    function generateQueryLote() {
+      loading.value = true;
+      const queryParamas = new Query({
+        outFields: ["*"],
+        where: "PRECHIP='AAA0030JPYN'",
+      });
+      query
+        .executeQueryJSON(
+          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/3",
+          queryParamas
+        )
+        .then((results) => {
+          for (const feature of results.features) {
+            generateQueryPredio(feature.attributes.BARMANPRE);
+          }
+        });
+    }
+
+    function generateQueryLotebyCodigoLote(lotcodigo) {
+      loading.value = true;
+      const queryParamas = new Query({
+        outFields: ["PRECHIP"],
+        where: "BARMANPRE='" + lotcodigo + "'",
+        returnDistinctValues: true,
+      });
+      // -- Este emit no iría acá, iría en la linea 540 --
+      emit("changeToBuscarMapaView", []);
+      query
+        .executeQueryJSON(
+          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/3",
+          queryParamas
+        )
+        .then((results) => {
+          for (const feature of results.features) {
+            generateQueryBuscarChip(feature.attributes.PRECHIP);
+          }
+        });
+    }
+
+    function generateQueryBuscarChip(chip) {
+      let data = [];
+      loading.value = false;
+      // GABI si buscas este chip AAA0055DUEP trae multiples resultados
+      axios({
+        method: "get",
+        url: "https://sisbic.idpc.gov.co/api/buscar_chip/" + chip,
+      })
+        .then(function (response) {
+          for (let item of response.data) {
+            axios({
+              method: "get",
+              url: "https://sisbic.idpc.gov.co/api/inmuebletotal/" + item.id,
+            })
+              .then(function (responseDetail) {
+                for (let itemDetail of responseDetail.data) {
+                  data.push(itemDetail);
+                }
+              })
+              .catch(function (response) {
+                loading.value = false;
+                console.log(response);
+              });
+          }
+          //este emit si iría aquí: emit('changeToBuscarMapaView', data)
+        })
+        .catch(function (response) {
+          loading.value = false;
+          console.log(response);
+        });
+    }
+
+    function generateQueryPredio(lotcodigo) {
+      const polygonSymbol = {
+        type: "simple-fill", // autocasts as SimpleFillSymbol
+        color: "purple",
+        style: "backward-diagonal",
+        outline: {
+          // autocasts as SimpleLineSymbol
+          color: "purple",
+          width: 3,
+        },
+      };
+
+      const queryParamas = new Query({
+        outFields: ["*"],
+        where: "LOTCODIGO='" + lotcodigo + "'",
+        returnGeometry: true,
+      });
+      query
+        .executeQueryJSON(
+          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/0",
+          queryParamas
+        )
+        .then((results) => {
+          for (const feature of results.features) {
+            const graphic = new Graphic({
+              geometry: feature.geometry,
+              symbol: polygonSymbol,
+              attributes: {
+                codLocalidad: feature.attributes.LOCCODIGO,
+                nombreLocalidad: feature.attributes.LOCNOMBRE,
+                count: 0,
+              },
+            });
+            graphicsLayer.add(graphic);
+            app.view.goTo(graphic);
+            loading.value = false;
+          }
+        });
+    }
+
     function searchClick() {
       app.view.popup.close();
+
+      generateQueryLote();
 
       arrCharts = [];
       const params = new FormData();
@@ -553,7 +635,7 @@ export default defineComponent({
       loading.value = true;
       axios({
         method: "post",
-        url: process.env.VUE_APP_URL_API_SICON,
+        url: "http://sis.scrd.gov.co/crud_SCRD_pv/api/Intercambioinformacion/geo_sicon_propuestas",
         data: params,
       })
         .then(function (response) {
@@ -634,6 +716,10 @@ export default defineComponent({
           loading.value = false;
           console.log(response);
         });
+    }
+
+    function clearClick() {
+      graphicsLayer.removeAll();
     }
 
     function populateArrCharts(item) {
@@ -784,6 +870,7 @@ export default defineComponent({
 
     return {
       searchClick,
+      clearClick,
       localidadGraphics,
       loading,
       entidadesItems,
