@@ -79,3 +79,21 @@
       }
     }
   }
+
+  .divider{
+    &__title{
+        width: 100%;
+        padding: 5px;
+        padding-left: 10px;
+        background-color: #f9b52c;
+        border-radius: 5px;
+        font-size: 16px;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+    &__text{
+      color: #000;
+      font-size: 17px;
+      margin-top: 3px;font-weight: 500;
+    }
+  }

@@ -46,7 +46,7 @@
         <ViewDEEP @changeToBuscarMapaView="changeToBuscarMapaView($event)" />
       </div>
       <div v-if="currentView === 'PorMapa'" class="route-content">
-        <ViewBuscarPorMapa :data="dataBuscarPorMapa"/>
+        <ViewBuscarPorMapa :data="dataBuscarPorMapa" @searchChip="currentView = 'SISBIC1'"/>
       </div>
     </div>
   </div>
@@ -84,8 +84,8 @@ export default defineComponent({
     const dataBuscarPorMapa = ref();
     const changeToBuscarMapaView = (data) => {
       //Aquí iría igualado a la variable data
-      dataBuscarPorMapa.value = {nombre: 'Jesús', apellidos: 'Ahumada '}
-      console.log(data);
+      dataBuscarPorMapa.value = data;
+      console.log('ASAsASAs', data);
       currentView.value = 'PorMapa';
     }
 

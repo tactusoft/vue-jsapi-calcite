@@ -11,6 +11,7 @@
             label="-- Seleccione --"
             selected
             disabled
+            :value="-1"
           ></calcite-option>
           <calcite-option
             v-for="item in anioItems"
@@ -63,6 +64,7 @@
         </calcite-select>
       </calcite-label>
     </div>
+    <p v-if="error" class="error">{{error}}</p>
     <!-- <div class="mt-3">
       <calcite-label
         >UPZ
@@ -149,6 +151,7 @@ export default defineComponent({
     let barrioActive = ref(true);
 
     const loading = ref(false);
+    const error = ref('');
     const chartData = {
       type: "doughnut",
       data: {},
@@ -512,7 +515,11 @@ export default defineComponent({
       const params = new FormData();
       params.append("username", "leonardo.briceno@scrd.gov.co");
       params.append("password", "ET65hG7iP5");
-
+      error.value = '';
+      if (anioSelected.value.selectedOption.value === -1) {
+        error.value = 'Elija un año valido, por favor.'
+        return
+      }
       if (entidadSelected.value.selectedOption.value) {
         params.append("entidad", entidadSelected.value.selectedOption.value);
       }
@@ -798,6 +805,7 @@ export default defineComponent({
       upzSelected,
       zupActive,
       barrioActive,
+      error
     };
   },
 });

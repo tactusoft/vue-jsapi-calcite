@@ -5,9 +5,10 @@
     <h3>Búsqueda por CHIP</h3>
     <div class="mt-3">
       <calcite-label>Digite el CHIP *
-        <calcite-input></calcite-input>
+        <calcite-input placeholder="A5821722F"></calcite-input>
       </calcite-label>
     </div>
+    <p class="error" v-if="error">{{error }}</p>
     <div class="mt-5">
       <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar</calcite-button>
     </div>
@@ -41,6 +42,9 @@ export default defineComponent({
     let layerBICNOPEMP;
 
     const loading = ref(false);
+    const chip = ref('');
+    const error = ref('');
+
 
     onMounted(async () => {
       app = await import("../../data/map");
@@ -227,24 +231,37 @@ export default defineComponent({
         .catch(function (err) {
           loading.value = false;
           console.log(err);
+          error.value = 'Parece que has enviado el chip de manera incorrecta...'
         });
     }
 
     function searchClick() {
-      app.view.popup.close();
-      loading.value = true;
-      //generateQueryBuscarChip();
+      if(chip.value == '') {
+        error.value = 'Parece que has enviado el chip de manera incorrecta...'
+      }else{
+        error.value = '';
+        app.view.popup.close();
+        loading.value = true;
+        generateQueryBuscarChip(chip.value);
+      }
     }
 
     function clearClick() {
-
+      
     }
+
+    onMounted( () => {
+      document.addEventListener('calciteInputChange', (e) => {
+        chip.value = e.target.value
+      })
+    })
 
     return {
       searchClick,
       clearClick,
       localidadGraphics,
       loading,
+      error
     };
   },
 });
