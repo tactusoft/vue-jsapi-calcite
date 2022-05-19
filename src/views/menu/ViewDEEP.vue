@@ -5,20 +5,21 @@
     <h3>Búsqueda por Nombre</h3>
     <div class="mt-3">
       <calcite-label>Digite el Nombre *
-        <calcite-input ref="nameValue"></calcite-input>
+        <calcite-input></calcite-input>
       </calcite-label>
     </div>
     <div class="mt-3">
       <calcite-label>Localidad
         <calcite-select ref="localidadSelected">
-          <calcite-option label="Ninguna" selected></calcite-option>
+          <calcite-option label="Ninguna" selected value="notselected"></calcite-option>
           <calcite-option v-for="item in localidadItems" :key="item.value" :value="item.value" :label="item.label">
           </calcite-option>
         </calcite-select>
       </calcite-label>
     </div>
+    <p class="error" v-if="error">{{error}}</p>
     <div class="mt-5">
-      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar</calcite-button>
+      <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
     </div>
   </div>
 </template>
@@ -41,16 +42,17 @@ import Graphic from "@arcgis/core/Graphic";
 export default defineComponent({
   name: "ViewDEEP",
   components: { Loader },
-  setup() {
+  setup(_, {emit}) {
     let app;
     let localidadGraphics = [];
     let graphicsLayer;
     let principalLayer;
 
     // --- Options for Selects --- //
-    let nameValue = ref();
+    const nameValue = ref('');
+    const error = ref();
     let localidadItems = ref([]);
-    let localidadSelected = ref();
+    const localidadSelected = ref();
     let localidadGraphicSelected;
 
     const loading = ref(false);
@@ -145,10 +147,12 @@ export default defineComponent({
     }
 
     function queryByLocalidad() {
+      let res;
       var queryParamas = principalLayer.createQuery();
       queryParamas.geometry = localidadGraphicSelected.geometry;
       principalLayer.queryFeatures(queryParamas)
         .then((results) => {
+          res = [...results.features]
           for (const feature of results.features) {
             app.view.goTo({
               target: feature.geometry,
@@ -158,21 +162,33 @@ export default defineComponent({
               easing: "in-out-expo"
             });
           }
+        }).then( () => {
+          emit('contentTable', res);
         });
     }
 
     function searchClick() {
-      app.view.popup.close();
-      //loading.value = true;
-      if (localidadSelected.value.selectedOption.value) {
-        queryByLocalidad();
+      if(localidadSelected.value.selectedOption.value == 'notselected' && nameValue.value == ''){
+        error.value = 'Por favor digita una opción válida'
+      }else{
+        error.value = ''
+        app.view.popup.close();
+        //loading.value = true;
+        if (localidadSelected.value.selectedOption.value) {
+          queryByLocalidad();
+        }
       }
-      console.log(nameValue);
     }
 
     function clearClick() {
 
     }
+
+    onMounted( () => {
+      document.addEventListener('calciteInputChange', (e) => {
+        nameValue.value = e.target.value
+      })
+    })
 
     return {
       searchClick,
@@ -182,6 +198,7 @@ export default defineComponent({
       nameValue,
       localidadItems,
       localidadSelected,
+      error
     };
   },
 });

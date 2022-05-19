@@ -2,7 +2,6 @@
     <div>
         <h2 class="menu__title">SISBIC</h2>
         <h3>Búsqueda por Mapa</h3>
-        <calcite-link @click="$emit('searchChip')">Buscar otro chip</calcite-link>
         <div class="divider">
             <h2 class="divider__title">Localización</h2>
             <div class="flex flex--justify-content-space-between">
@@ -59,7 +58,7 @@ export default defineComponent({
     name: 'ViewBuscarPorMapa',
     props: ['data'],
     setup(props) {
-        console.log(props.data);
+        console.log('AQUÍ ESTÁN LOS PROPS',props.data);
     },
 })
 </script>

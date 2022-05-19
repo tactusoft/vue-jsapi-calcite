@@ -43,10 +43,13 @@
         <ViewSISBIC @changeToBuscarMapaView="changeToBuscarMapaView($event)" />
       </div>
       <div v-if="currentView === 'DEEP1'" class="route-content">
-        <ViewDEEP @changeToBuscarMapaView="changeToBuscarMapaView($event)" />
+        <ViewDEEP @contentTable="changeToContentTableView($event)" />
       </div>
       <div v-if="currentView === 'PorMapa'" class="route-content">
-        <ViewBuscarPorMapa :data="dataBuscarPorMapa" @searchChip="currentView = 'SISBIC1'"/>
+        <ViewBuscarPorMapa :data="dataBuscarPorMapa"/>
+      </div>
+      <div v-if="currentView === 'contentTable'" class="route-content">
+        <viewTable :data="dataContentTable" />
       </div>
     </div>
   </div>
@@ -60,6 +63,8 @@ import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
 import ViewDEEP from "../../../../views/menu/ViewDEEP.vue";
 import ViewBuscarPorMapa from "../../../../views/menu/ViewBuscarPorMapa.vue";
+import viewTable from "../../../../views/menu/viewTable.vue";
+
 
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
 import "@esri/calcite-components/dist/custom-elements/bundles/icon";
@@ -67,7 +72,7 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBuscarPorMapa },
+  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBuscarPorMapa, viewTable },
   emits: ["routing"],
   props: {
     show: {
@@ -77,19 +82,26 @@ export default defineComponent({
   },
   setup() {
     const currentView = ref("home");
-
     const routingHandler = (route) => currentView.value = route;
+    const goBackHandler = () => {
+      if(currentView.value === 'PorMapa') currentView.value = 'SISBIC1'
+      if(currentView.value === 'contentTable') currentView.value = 'DEEP1'
+      else currentView.value = 'home';
+    };
 
-    const goBackHandler = () => currentView.value = "home";
     const dataBuscarPorMapa = ref();
+    const dataContentTable = ref();
     const changeToBuscarMapaView = (data) => {
       //Aquí iría igualado a la variable data
       dataBuscarPorMapa.value = data;
-      console.log('ASAsASAs', data);
       currentView.value = 'PorMapa';
     }
+    const changeToContentTableView = (data) => {
+      dataContentTable.value = data;
+      currentView.value = 'contentTable';
+    }
 
-    return { currentView, routingHandler, goBackHandler, changeToBuscarMapaView, dataBuscarPorMapa };
+    return { currentView, routingHandler, goBackHandler, changeToBuscarMapaView, dataBuscarPorMapa, changeToContentTableView, dataContentTable };
   },
 });
 </script>

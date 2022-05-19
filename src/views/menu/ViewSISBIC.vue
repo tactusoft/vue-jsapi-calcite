@@ -53,6 +53,7 @@ export default defineComponent({
 
       layerBIC = new FeatureLayer({
         url: "https://services2.arcgis.com/EK0CumERYSQlzENC/ArcGIS/rest/services/IDPC/FeatureServer/0",
+        lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
           actions: [
@@ -94,6 +95,7 @@ export default defineComponent({
 
       layerBICNOPEMP = new FeatureLayer({
         url: "https://services2.arcgis.com/EK0CumERYSQlzENC/ArcGIS/rest/services/IDPC/FeatureServer/1",
+        lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
           actions: [
