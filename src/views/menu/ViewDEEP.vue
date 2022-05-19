@@ -17,7 +17,7 @@
         </calcite-select>
       </calcite-label>
     </div>
-    <p class="error" v-if="error">{{error}}</p>
+    <p class="error" v-if="error">{{ error }}</p>
     <div class="mt-5">
       <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
     </div>
@@ -42,7 +42,7 @@ import Graphic from "@arcgis/core/Graphic";
 export default defineComponent({
   name: "ViewDEEP",
   components: { Loader },
-  setup(_, {emit}) {
+  setup(_, { emit }) {
     let app;
     let localidadGraphics = [];
     let graphicsLayer;
@@ -59,8 +59,6 @@ export default defineComponent({
 
     onMounted(async () => {
       app = await import("../../data/map");
-      graphicsLayer = new GraphicsLayer();
-      app.view.map.add(graphicsLayer);
 
       principalLayer = new FeatureLayer({
         url: "https://services2.arcgis.com/EK0CumERYSQlzENC/arcgis/rest/services/Distritos_Creativos/FeatureServer/0",
@@ -97,6 +95,9 @@ export default defineComponent({
           app.view.goTo(response.extent);
         });
 
+      graphicsLayer = new GraphicsLayer();
+      app.view.map.add(graphicsLayer);
+
       generateQueryLocalidades();
       localidadSelected.value.addEventListener("calciteSelectChange", () =>
         zoomToLocalidad()
@@ -105,8 +106,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       app.view.popup.close();
-      app.view.map.remove(graphicsLayer);
-      app.view.map.remove(principalLayer);
+      //app.view.map.remove(graphicsLayer);
+      //app.view.map.remove(principalLayer);
     });
 
     function generateQueryLocalidades() {
@@ -147,6 +148,16 @@ export default defineComponent({
     }
 
     function queryByLocalidad() {
+      const symbol = {
+        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+        color: [51, 51, 204, 0.9],
+        style: "solid",
+        outline: {  // autocasts as new SimpleLineSymbol()
+          color: "white",
+          width: 1
+        }
+      };
+
       let res;
       var queryParamas = principalLayer.createQuery();
       queryParamas.geometry = localidadGraphicSelected.geometry;
@@ -154,23 +165,24 @@ export default defineComponent({
         .then((results) => {
           res = [...results.features]
           for (const feature of results.features) {
-            app.view.goTo({
-              target: feature.geometry,
-              tilt: 70
-            }, {
-              duration: 1000,
-              easing: "in-out-expo"
+            const graphic = new Graphic({
+              geometry: feature.geometry,
+              attributes: feature.attributes,
+              symbol
             });
+            graphicsLayer.add(graphic);
           }
-        }).then( () => {
+          app.view.goTo(graphicsLayer.graphics);
+        }).then(() => {
           emit('contentTable', res);
         });
     }
 
     function searchClick() {
-      if(localidadSelected.value.selectedOption.value == 'notselected' && nameValue.value == ''){
+      graphicsLayer.removeAll();
+      if (localidadSelected.value.selectedOption.value == 'notselected' && nameValue.value == '') {
         error.value = 'Por favor digita una opción válida'
-      }else{
+      } else {
         error.value = ''
         app.view.popup.close();
         //loading.value = true;
@@ -184,7 +196,7 @@ export default defineComponent({
 
     }
 
-    onMounted( () => {
+    onMounted(() => {
       document.addEventListener('calciteInputChange', (e) => {
         nameValue.value = e.target.value
       })
