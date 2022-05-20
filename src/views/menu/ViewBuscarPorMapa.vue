@@ -6,21 +6,21 @@
             <h2 class="divider__title">Localización</h2>
             <div class="flex flex--justify-content-space-between">
                 <div>
-                    <calcite-label>Nombre</calcite-label>
+                    <label>Nombre</label>
                     <p class="divider__text">{{data.nombre || '--'}}</p>
                 </div>
                 <div>
-                    <calcite-label>Localidad</calcite-label>
+                    <label>Localidad</label>
                     <p class="divider__text">{{data.localidad || '--'}}</p>
                 </div>
             </div>
             <div class="flex flex--justify-content-space-between">
                 <div>
-                    <calcite-label>Barrio</calcite-label>
+                    <label>Barrio</label>
                     <p class="divider__text">{{data.barrio_1 || '--'}}</p>
                 </div>
                 <div>
-                    <calcite-label>Dirección</calcite-label>
+                    <label>Dirección</label>
                     <p class="divider__text">{{data.direccion || '--'}}</p>
                 </div>
             </div>
@@ -30,21 +30,21 @@
             <h2 class="divider__title">Información patrimonial</h2>
             <div class="flex flex--justify-content-space-between">
                 <div>
-                    <calcite-label>Grupo patrimonial</calcite-label>
+                    <label>Grupo patrimonial</label>
                     <p class="divider__text">{{data.grupo_patr || '--'}}</p>
                 </div>
                 <div>
-                    <calcite-label>Subgrupo patrimonial</calcite-label>
+                    <label>Subgrupo patrimonial</label>
                     <p class="divider__text">{{data.subgrupo_p || '--'}}</p>
                 </div>
             </div>
             <div class="flex flex--justify-content-space-between">
                 <div>
-                    <calcite-label>Grupo</calcite-label>
+                    <label>Grupo</label>
                     <p class="divider__text">{{data.grupo || '--'}}</p>
                 </div>
                 <div>
-                    <calcite-label>Categoría</calcite-label>
+                    <label>Categoría</label>
                     <p class="divider__text">{{data.categoria || '--'}}</p>
                 </div>
             </div>

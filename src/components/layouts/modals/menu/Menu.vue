@@ -93,6 +93,7 @@ export default defineComponent({
     const dataContentTable = ref();
     const changeToBuscarMapaView = (data) => {
       //Aquí iría igualado a la variable data
+      delete data.geom;
       dataBuscarPorMapa.value = data;
       currentView.value = 'PorMapa';
     }
