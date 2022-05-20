@@ -148,6 +148,7 @@ export default defineComponent({
     }
 
     function queryByLocalidad() {
+      const arr = [];
       const symbol = {
         type: "simple-fill",  // autocasts as new SimpleFillSymbol()
         color: [51, 51, 204, 0.9],
@@ -157,24 +158,22 @@ export default defineComponent({
           width: 1
         }
       };
-
-      let res;
       var queryParamas = principalLayer.createQuery();
       queryParamas.geometry = localidadGraphicSelected.geometry;
       principalLayer.queryFeatures(queryParamas)
         .then((results) => {
-          res = [...results.features]
           for (const feature of results.features) {
             const graphic = new Graphic({
               geometry: feature.geometry,
               attributes: feature.attributes,
               symbol
             });
+            arr.push(graphic.attributes);
             graphicsLayer.add(graphic);
           }
           app.view.goTo(graphicsLayer.graphics);
-        }).then(() => {
-          emit('contentTable', res);
+        }).then( () => {
+            emit('contentTable', arr)
         });
     }
 
@@ -210,7 +209,7 @@ export default defineComponent({
       nameValue,
       localidadItems,
       localidadSelected,
-      error
+      error,
     };
   },
 });
