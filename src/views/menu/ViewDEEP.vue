@@ -1,5 +1,17 @@
 <template>
-  <div>
+  <div v-if="!dataItems">
+    <calcite-button
+              @click="$emit('goHome')"
+              appearance="transparent"
+              class="menu__button menu__button--back"
+              color="red"
+              >
+              <calcite-icon
+              icon="arrow-bold-left"
+              scale="s"
+              aria-hidden="true"
+              ></calcite-icon>
+    </calcite-button>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">DEEP</h2>
     <h3>Búsqueda por Nombre</h3>
@@ -22,6 +34,9 @@
       <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
     </div>
   </div>
+  <div v-else>
+    <ViewTable :data="dataItems" @goBack="dataItems = null" />
+  </div>
 </template>
 
 <script>
@@ -38,11 +53,12 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 import Graphic from "@arcgis/core/Graphic";
+import ViewTable from "./viewTable.vue";
 
 export default defineComponent({
   name: "ViewDEEP",
-  components: { Loader },
-  setup(_, { emit }) {
+  components: { Loader, ViewTable },
+  setup() {
     let app;
     let localidadGraphics = [];
     let graphicsLayer;
@@ -51,6 +67,7 @@ export default defineComponent({
     // --- Options for Selects --- //
     const nameValue = ref('');
     const error = ref();
+    const dataItems = ref();
     let localidadItems = ref([]);
     const localidadSelected = ref();
     let localidadGraphicSelected;
@@ -173,7 +190,7 @@ export default defineComponent({
           }
           app.view.goTo(graphicsLayer.graphics);
         }).then( () => {
-            emit('contentTable', arr)
+            dataItems.value = arr;
         });
     }
 
@@ -210,6 +227,7 @@ export default defineComponent({
       localidadItems,
       localidadSelected,
       error,
+      dataItems
     };
   },
 });

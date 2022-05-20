@@ -24,6 +24,7 @@
         appearance="transparent"
         class="menu__button menu__button--back"
         color="red"
+        v-if="currentView != 'SISBIC1' || currentView != 'DEEP1'"
       >
         <calcite-icon
           icon="arrow-bold-left"
@@ -40,16 +41,10 @@
         <ViewSICON />
       </div>
       <div v-if="currentView === 'SISBIC1'" class="route-content">
-        <ViewSISBIC @changeToBuscarMapaView="changeToBuscarMapaView($event)" />
+        <ViewSISBIC @goHome="goBackHandler"/>
       </div>
       <div v-if="currentView === 'DEEP1'" class="route-content">
-        <ViewDEEP @contentTable="changeToContentTableView($event)" />
-      </div>
-      <div v-if="currentView === 'PorMapa'" class="route-content">
-        <ViewBuscarPorMapa :data="dataBuscarPorMapa"/>
-      </div>
-      <div v-if="currentView === 'contentTable'" class="route-content">
-        <viewTable :data="dataContentTable" />
+        <ViewDEEP @goHome="goBackHandler"/>
       </div>
     </div>
   </div>
@@ -62,8 +57,6 @@ import Home from "../../../../views/menu/Home.vue";
 import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
 import ViewDEEP from "../../../../views/menu/ViewDEEP.vue";
-import ViewBuscarPorMapa from "../../../../views/menu/ViewBuscarPorMapa.vue";
-import viewTable from "../../../../views/menu/viewTable.vue";
 
 
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
@@ -72,7 +65,7 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBuscarPorMapa, viewTable },
+  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP },
   emits: ["routing"],
   props: {
     show: {
@@ -83,26 +76,10 @@ export default defineComponent({
   setup() {
     const currentView = ref("home");
     const routingHandler = (route) => currentView.value = route;
-    const goBackHandler = () => {
-      if(currentView.value === 'PorMapa') currentView.value = 'SISBIC1'
-      if(currentView.value === 'contentTable') currentView.value = 'DEEP1'
-      else currentView.value = 'home';
-    };
+    const goBackHandler = () => currentView.value = 'home';
 
-    const dataBuscarPorMapa = ref();
-    const dataContentTable = ref();
-    const changeToBuscarMapaView = (data) => {
-      //Aquí iría igualado a la variable data
-      delete data.geom;
-      dataBuscarPorMapa.value = data;
-      currentView.value = 'PorMapa';
-    }
-    const changeToContentTableView = (data) => {
-      dataContentTable.value = data;
-      currentView.value = 'contentTable';
-    }
 
-    return { currentView, routingHandler, goBackHandler, changeToBuscarMapaView, dataBuscarPorMapa, changeToContentTableView, dataContentTable };
+    return { currentView, routingHandler, goBackHandler};
   },
 });
 </script>

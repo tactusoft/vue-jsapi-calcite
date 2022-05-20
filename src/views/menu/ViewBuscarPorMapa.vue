@@ -1,5 +1,17 @@
 <template>
     <div>
+        <calcite-button
+        @click="$emit('otherChip')"
+        appearance="transparent"
+        class="menu__button menu__button--back"
+        color="red"
+        >
+        <calcite-icon
+          icon="arrow-bold-left"
+          scale="s"
+          aria-hidden="true"
+        ></calcite-icon>
+        </calcite-button>
         <h2 class="menu__title">SISBIC</h2>
         <h3>Búsqueda por Mapa</h3>
         <div class="divider">
@@ -57,8 +69,5 @@ import { defineComponent } from 'vue'
 export default defineComponent({
     name: 'ViewBuscarPorMapa',
     props: ['data'],
-    setup(props) {
-        console.log('AQUÍ ESTÁN LOS PROPS',props.data);
-    },
 })
 </script>

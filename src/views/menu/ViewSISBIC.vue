@@ -1,5 +1,17 @@
 <template>
-  <div>
+  <div v-if="!dataMapa">
+    <calcite-button
+        @click="$emit('goHome')"
+        appearance="transparent"
+        class="menu__button menu__button--back"
+        color="red"
+        >
+        <calcite-icon
+          icon="arrow-bold-left"
+          scale="s"
+          aria-hidden="true"
+        ></calcite-icon>
+    </calcite-button>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">IDPC</h2>
     <h3>Búsqueda por CHIP</h3>
@@ -12,6 +24,9 @@
     <div class="mt-5">
       <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar</calcite-button>
     </div>
+  </div>
+  <div class="" v-else>
+    <ViewBuscarPorMapa :data="dataMapa" @otherChip="dataMapa = null" />
   </div>
 </template>
 
@@ -30,11 +45,12 @@ import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 
 import axios from "axios";
+import ViewBuscarPorMapa from "./ViewBuscarPorMapa.vue";
 
 export default defineComponent({
   name: "ViewSISBIC",
-  components: { Loader },
-  setup(_, { emit }) {
+  components: { Loader, ViewBuscarPorMapa },
+  setup() {
     let app;
     let localidadGraphics = [];
     let graphicsLayer;
@@ -44,6 +60,7 @@ export default defineComponent({
     const loading = ref(false);
     const chip = ref('');
     const error = ref('');
+    const dataMapa = ref();
 
 
     onMounted(async () => {
@@ -218,7 +235,7 @@ export default defineComponent({
             })
               .then(function (responseDetail) {
                 if (responseDetail.data.length > 0) {
-                  emit("changeToBuscarMapaView", responseDetail.data[0]);
+                  dataMapa.value = responseDetail.data[0]
                 }
                 loading.value = false;
               })
@@ -263,7 +280,8 @@ export default defineComponent({
       clearClick,
       localidadGraphics,
       loading,
-      error
+      error,
+      dataMapa
     };
   },
 });

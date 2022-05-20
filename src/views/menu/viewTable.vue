@@ -1,4 +1,16 @@
 <template>
+    <calcite-button
+            @click="$emit('goBack')"
+            appearance="transparent"
+            class="menu__button menu__button--back"
+            color="red"
+            >
+            <calcite-icon
+            icon="arrow-bold-left"
+            scale="s"
+            aria-hidden="true"
+            ></calcite-icon>
+    </calcite-button>
     <div class="mt-5">
         <h2>Barrios</h2>
         <ul class="deepE mt-4">
