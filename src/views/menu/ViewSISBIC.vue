@@ -187,8 +187,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       app.view.map.remove(graphicsLayer);
-      //app.view.map.remove(layerBIC);
-      //app.view.map.remove(layerBICNOPEMP);
+      app.view.map.remove(layerBIC);
+      app.view.map.remove(layerBICNOPEMP);
     });
 
     function generateQueryLotebyCodigoLote(lotcodigo) {
