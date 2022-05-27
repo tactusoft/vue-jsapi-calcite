@@ -16,11 +16,6 @@
     <h2 class="menu__title">DEEP</h2>
     <h3>Búsqueda por Nombre</h3>
     <div class="mt-3">
-      <calcite-label>Digite el Nombre *
-        <calcite-input></calcite-input>
-      </calcite-label>
-    </div>
-    <div class="mt-3">
       <calcite-label>Localidad
         <calcite-select ref="localidadSelected">
           <calcite-option label="Ninguna" selected value="notselected"></calcite-option>
@@ -28,6 +23,14 @@
           </calcite-option>
         </calcite-select>
       </calcite-label>
+    </div>
+    <div class="mt-3">
+      <calcite-label>Nombre del distrito</calcite-label>
+      <calcite-combobox scale="s" id="comboBoxDistrito" placeholder="Seleccione los distritos">
+        <calcite-combobox-item value="d1" text-label="Distrito 1"></calcite-combobox-item>
+        <calcite-combobox-item value="d2" text-label="Distrito 2"></calcite-combobox-item>
+        <calcite-combobox-item value="d3" text-label="Distrito 3"></calcite-combobox-item>
+      </calcite-combobox>
     </div>
     <p class="error" v-if="error">{{ error }}</p>
     <div class="mt-5">
@@ -46,6 +49,8 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 import "@esri/calcite-components/dist/custom-elements/bundles/select";
 import "@esri/calcite-components/dist/custom-elements/bundles/switch";
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
+import "@esri/calcite-components/dist/custom-elements/bundles/combobox";
+
 import Loader from "@/components/layouts/Loader.vue";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
@@ -65,12 +70,12 @@ export default defineComponent({
     let principalLayer;
 
     // --- Options for Selects --- //
-    const nameValue = ref('');
     const error = ref();
     const dataItems = ref();
     let localidadItems = ref([]);
     const localidadSelected = ref();
     let localidadGraphicSelected;
+    const comboBoxDistrito = ref([]);
 
     const loading = ref(false);
 
@@ -78,7 +83,7 @@ export default defineComponent({
       app = await import("../../data/map");
 
       principalLayer = new FeatureLayer({
-        url: "https://services2.arcgis.com/EK0CumERYSQlzENC/arcgis/rest/services/Distritos_Creativos/FeatureServer/0",
+        url: process.env.VUE_APP_URL_DISTRITOSCREATIVOS,
         popupTemplate: {
           title: "{NOMBRE}",
           actions: [],
@@ -108,7 +113,6 @@ export default defineComponent({
           return principalLayer.queryExtent(query);
         })
         .then((response) => {
-          console.log(response.extent);
           app.view.goTo(response.extent);
         });
 
@@ -196,7 +200,7 @@ export default defineComponent({
 
     function searchClick() {
       graphicsLayer.removeAll();
-      if (localidadSelected.value.selectedOption.value == 'notselected' && nameValue.value == '') {
+      if (localidadSelected.value.selectedOption.value == 'notselected' || comboBoxDistrito.value.length === 0) {
         error.value = 'Por favor digita una opción válida'
       } else {
         error.value = ''
@@ -213,9 +217,10 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      document.addEventListener('calciteInputChange', (e) => {
-        nameValue.value = e.target.value
-      })
+     var comboBox = document.querySelector("#comboBoxDistrito");
+      comboBox.addEventListener('calciteLookupChange', (e) => {
+        comboBoxDistrito.value = e.detail
+      });
     })
 
     return {
@@ -223,11 +228,11 @@ export default defineComponent({
       clearClick,
       localidadGraphics,
       loading,
-      nameValue,
       localidadItems,
       localidadSelected,
       error,
-      dataItems
+      dataItems,
+      comboBoxDistrito
     };
   },
 });

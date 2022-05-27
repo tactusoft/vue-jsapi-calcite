@@ -69,7 +69,7 @@ export default defineComponent({
       app.view.map.add(graphicsLayer);
 
       layerBIC = new FeatureLayer({
-        url: "https://services2.arcgis.com/EK0CumERYSQlzENC/ArcGIS/rest/services/IDPC/FeatureServer/0",
+        url: process.env.VUE_APP_URL_IDPC+'0',
         lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
@@ -111,7 +111,7 @@ export default defineComponent({
       app.view.map.add(layerBIC);
 
       layerBICNOPEMP = new FeatureLayer({
-        url: "https://services2.arcgis.com/EK0CumERYSQlzENC/ArcGIS/rest/services/IDPC/FeatureServer/1",
+        url: process.env.VUE_APP_URL_IDPC+'1',
         lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
@@ -200,7 +200,7 @@ export default defineComponent({
       });
       query
         .executeQueryJSON(
-          "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/catastro/lote/MapServer/3",
+          process.env.VUE_APP_URL_CODLOTE,
           queryParamas
         )
         .then((results) => {
@@ -220,7 +220,7 @@ export default defineComponent({
     function generateQueryBuscarChip(chip) {
       axios({
         method: "get",
-        url: "https://sisbic.idpc.gov.co/api/buscar_chip/" + chip,
+        url: process.env.VUE_APP_URL_CHIP + 'buscar_chip/' + chip,
       })
         .then(function (response) {
           if (response.data.length > 0) {
@@ -231,7 +231,7 @@ export default defineComponent({
             }
             axios({
               method: "get",
-              url: "https://sisbic.idpc.gov.co/api/" + urlApi
+              url: process.env.VUE_APP_URL_CHIP + urlApi
             })
               .then(function (responseDetail) {
                 if (responseDetail.data.length > 0) {

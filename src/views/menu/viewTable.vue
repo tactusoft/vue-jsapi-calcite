@@ -13,16 +13,30 @@
     </calcite-button>
     <div class="mt-5">
         <h2>Barrios</h2>
-        <ul class="deepE mt-4">
-            <li class="deepE__element" :class="selectedItem == feature.FID ? 'selected': ''" v-for="feature in data" :key="feature.FID" @click="selectedItem = feature.FID">
-                <p>{{feature.Nombre}}</p>
-                <calcite-icon :icon="selectedItem == feature.FID ? 'check-square': 'square'"></calcite-icon>
+        <ul class="deepE mt-4" v-if="data.length > 0">
+            <li class="deepE__element" :class="selectedItem === feature.OBJECTID ? 'selected': ''" v-for="feature in data" :key="feature.OBJECTID" @click="selectedItem = feature.OBJECTID">
+                <div style="flex: 1;">
+                    <p>Distrito creativo <span class="semi-bold">{{feature.nombre}}</span></p>
+                    <p>Acto juridico : XXXXXX</p>
+                    <p>Localidades : XXXXXX</p>
+                    <div class="flex flex--justify-content-space-between">
+                        <p>Area : <span class="semi-bold">{{feature.area_m2}}m</span></p>
+                        <p>Perimetro : <span class="semi-bold">{{feature.perim_m2}}m</span></p>
+                    </div>
+                </div>
+                <calcite-icon :icon="selectedItem == feature.OBJECTID ? 'check-square': 'square'"></calcite-icon>
             </li>
         </ul>
+        <div v-else>
+            <h3>Parece que esta localidad no tiene datos</h3>
+        </div>
     </div>
 </template>
 <script>
 import { defineComponent, ref } from 'vue'
+import "@esri/calcite-components/dist/custom-elements/bundles/icon";
+import "@esri/calcite-components/dist/custom-elements/bundles/button";
+
 
 export default defineComponent({
     name: 'viewTable',
@@ -44,10 +58,10 @@ export default defineComponent({
         &__element{
             padding: 10px;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             cursor: pointer;
-            border-bottom: 1px solid #ccc;
+            border-top: 1px solid #ccc;
             transition: all 0.5s;
             p{
                 flex: 1;
@@ -58,5 +72,8 @@ export default defineComponent({
                 font-weight: 700;
             }
         }
+    }
+    .semi-bold{
+       font-weight: 600; 
     }
 </style>
