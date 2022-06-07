@@ -1,16 +1,8 @@
 <template>
   <div v-if="!dataItems">
-    <calcite-button
-              @click="$emit('goHome')"
-              appearance="transparent"
-              class="menu__button menu__button--back"
-              color="red"
-              >
-              <calcite-icon
-              icon="arrow-bold-left"
-              scale="s"
-              aria-hidden="true"
-              ></calcite-icon>
+    <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
+      color="red">
+      <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">DEEP</h2>
@@ -27,9 +19,9 @@
     <div class="mt-3">
       <calcite-label>Nombre del distrito</calcite-label>
       <calcite-combobox scale="s" id="comboBoxDistrito" placeholder="Seleccione los distritos">
-        <calcite-combobox-item value="d1" text-label="Distrito 1"></calcite-combobox-item>
-        <calcite-combobox-item value="d2" text-label="Distrito 2"></calcite-combobox-item>
-        <calcite-combobox-item value="d3" text-label="Distrito 3"></calcite-combobox-item>
+        <calcite-combobox-item v-for="item in distritosCreativosItems" :key="item.value" :value="item.value"
+          :text-label="item.label">
+        </calcite-combobox-item>
       </calcite-combobox>
     </div>
     <p class="error" v-if="error">{{ error }}</p>
@@ -58,7 +50,7 @@ import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 import Graphic from "@arcgis/core/Graphic";
-import ViewTable from "./viewTable.vue";
+import ViewTable from "./ViewTable.vue";
 
 export default defineComponent({
   name: "ViewDEEP",
@@ -73,6 +65,7 @@ export default defineComponent({
     const error = ref();
     const dataItems = ref();
     let localidadItems = ref([]);
+    let distritosCreativosItems = ref([]);
     const localidadSelected = ref();
     let localidadGraphicSelected;
     const comboBoxDistrito = ref([]);
@@ -120,9 +113,16 @@ export default defineComponent({
       app.view.map.add(graphicsLayer);
 
       generateQueryLocalidades();
+      generateQueryDistritosCreativos();
+
       localidadSelected.value.addEventListener("calciteSelectChange", () =>
         zoomToLocalidad()
       );
+
+      var comboBox = document.querySelector("#comboBoxDistrito");
+      comboBox.addEventListener('calciteLookupChange', (e) => {
+        comboBoxDistrito.value = e.detail
+      });
     });
 
     onUnmounted(() => {
@@ -154,6 +154,24 @@ export default defineComponent({
             localidadItems.value.push({
               value: feature.attributes.LOCCODIGO,
               label: feature.attributes.LOCNOMBRE,
+            });
+          }
+        });
+    }
+
+    function generateQueryDistritosCreativos() {
+      const queryParamas = new Query({
+        outFields: ["*"],
+        returnGeometry: false,
+        where: "1=1",
+      });
+      query
+        .executeQueryJSON(process.env.VUE_APP_URL_DISTRITOSCREATIVOS, queryParamas)
+        .then((results) => {
+          for (const feature of results.features) {
+            distritosCreativosItems.value.push({
+              value: feature.attributes.OBJECTID,
+              label: feature.attributes.nombre,
             });
           }
         });
@@ -193,14 +211,14 @@ export default defineComponent({
             graphicsLayer.add(graphic);
           }
           app.view.goTo(graphicsLayer.graphics);
-        }).then( () => {
-            dataItems.value = arr;
+        }).then(() => {
+          dataItems.value = arr;
         });
     }
 
     function searchClick() {
       graphicsLayer.removeAll();
-      if (localidadSelected.value.selectedOption.value == 'notselected' || comboBoxDistrito.value.length === 0) {
+      if (localidadSelected.value.selectedOption.value == 'notselected' && comboBoxDistrito.value.length === 0) {
         error.value = 'Por favor digita una opción válida'
       } else {
         error.value = ''
@@ -216,13 +234,6 @@ export default defineComponent({
 
     }
 
-    onMounted(() => {
-     var comboBox = document.querySelector("#comboBoxDistrito");
-      comboBox.addEventListener('calciteLookupChange', (e) => {
-        comboBoxDistrito.value = e.detail
-      });
-    })
-
     return {
       searchClick,
       clearClick,
@@ -232,7 +243,8 @@ export default defineComponent({
       localidadSelected,
       error,
       dataItems,
-      comboBoxDistrito
+      comboBoxDistrito,
+      distritosCreativosItems
     };
   },
 });

@@ -6,8 +6,10 @@
         menuName="SICON" @routingMenu="menuHandler($event)" />
       <Category :color="currentMenuName === 'SISBIC' ? 'blue' : 'inverse'" icon="analysis" text="IDPC" menuName="SISBIC"
         @routingMenu="menuHandler($event)" />
-      <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="DEEP" menuName="DEEP"
-        @routingMenu="menuHandler($event)" />
+      <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="DEEP"
+        menuName="DEEP" @routingMenu="menuHandler($event)" />
+      <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="Bibliotecas"
+        menuName="DEEP" @routingMenu="menuHandler($event)" />
     </div>
   </div>
   <div class="menu__content__list">
