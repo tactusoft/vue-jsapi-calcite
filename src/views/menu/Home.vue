@@ -1,7 +1,7 @@
 <template>
   <div class="menu__content__category">
     <h2 class="menu__title">Categorías</h2>
-    <div class="flex flex--justify-content-space-around mt">
+    <div class="flex flex--justify-content-start mt">
       <Category :color="currentMenuName === 'SICON' ? 'blue' : 'inverse'" icon="conference-room" text="SICON"
         menuName="SICON" @routingMenu="menuHandler($event)" />
       <Category :color="currentMenuName === 'SISBIC' ? 'blue' : 'inverse'" icon="analysis" text="IDPC" menuName="SISBIC"
