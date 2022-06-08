@@ -18,7 +18,7 @@
     </div>
     <div class="mt-3">
       <calcite-label>Nombre del distrito</calcite-label>
-      <calcite-combobox scale="s" id="comboBoxDistrito" placeholder="Seleccione los distritos">
+      <calcite-combobox scale="s" placeholder="Seleccione los distritos">
         <calcite-combobox-item v-for="item in distritosCreativosItems" :key="item.value" :value="item.value" :selected="comboBoxDistritoSelectedValue.includes(item.value) ? true : false"
           :text-label="item.label">
         </calcite-combobox-item>
@@ -69,7 +69,6 @@ export default defineComponent({
     const localidadSelected = ref();
     const localidad = ref();
     let localidadGraphicSelected;
-    const comboBoxDistrito = ref([]);
     const comboBoxDistritoSelectedValue = ref([])
 
     const loading = ref(false);
@@ -120,10 +119,12 @@ export default defineComponent({
       localidadSelected.value.addEventListener("calciteSelectChange", () =>
         zoomToLocalidad()
       );
+    });
 
-      var comboBox = document.querySelector("#comboBoxDistrito");
-      comboBox.addEventListener('calciteLookupChange', (e) => {
-        comboBoxDistrito.value = e.detail
+    onMounted( () => {
+      document.addEventListener('calciteLookupChange', (e) => {
+        comboBoxDistritoSelectedValue.value = e.detail.map(item => item.value);
+        console.log(comboBoxDistritoSelectedValue.value)
       });
     });
 
@@ -219,16 +220,14 @@ export default defineComponent({
     }
     function searchClick() {
       graphicsLayer.removeAll();
-      if (localidadSelected.value.selectedOption.value == 'notselected' && comboBoxDistrito.value.length === 0) {
+      if (localidadSelected.value.selectedOption.value == 'notselected' && comboBoxDistritoSelectedValue.value.length === 0) {
         error.value = 'Por favor digita una opción válida'
       } else {
-        console.log(comboBoxDistrito.value[0].value)
         error.value = ''
         app.view.popup.close();
         //loading.value = true;
         if (localidadSelected.value.selectedOption.value) {
           localidad.value = localidadSelected.value.selectedOption.value
-          comboBoxDistritoSelectedValue.value = comboBoxDistrito.value.map(item => item.value);
           queryByLocalidad();
         }
       }
@@ -247,7 +246,6 @@ export default defineComponent({
       localidadSelected,
       error,
       dataItems,
-      comboBoxDistrito,
       distritosCreativosItems,
       localidad,
       comboBoxDistritoSelectedValue
