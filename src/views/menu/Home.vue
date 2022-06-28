@@ -8,14 +8,15 @@
         @routingMenu="menuHandler($event)" />
       <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="DEEP"
         menuName="DEEP" @routingMenu="menuHandler($event)" />
-      <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="Bibliotecas"
-        menuName="DEEP" @routingMenu="menuHandler($event)" />
+      <Category :color="currentMenuName === 'BIBLIO' ? 'blue' : 'inverse'" icon="layer-graphics" text="Bibliotecas"
+        menuName="BIBLIO" @routingMenu="menuHandler($event)" />
     </div>
   </div>
   <div class="menu__content__list">
     <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'SICON'" :subMenu="SICONSubMenu" />
     <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'SISBIC'" :subMenu="SISBICMenu1" />
     <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'DEEP'" :subMenu="DEEPMenu1" />
+    <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'BIBLIO'" :subMenu="BIBLIOMenu1" />
   </div>
 </template>
 
@@ -53,6 +54,14 @@ export default defineComponent({
       },
     ];
 
+     const BIBLIOMenu1 = [
+      {
+        title: "Búsqueda por NOMBRE",
+        description: "BIBLIO",
+        route: "BIBLIO1",
+      },
+    ];
+
     const currentMenuName = ref("SICON");
 
     const routingHandler = (route) => emit("routing", route);
@@ -66,6 +75,7 @@ export default defineComponent({
       SICONSubMenu,
       SISBICMenu1,
       DEEPMenu1,
+      BIBLIOMenu1,
     };
   },
 });

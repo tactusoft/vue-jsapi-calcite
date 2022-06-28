@@ -1,15 +1,8 @@
 <template>
   <div class="menu" :class="show ? 'is-active' : ''">
     <!-- Hamburger button -->
-    <calcite-button
-      class="menu__button menu__button--toggle"
-      @click="$emit('toggleShowMenu')"
-    >
-      <calcite-icon
-        icon="hamburger"
-        scale="s"
-        aria-hidden="true"
-      ></calcite-icon>
+    <calcite-button class="menu__button menu__button--toggle" @click="$emit('toggleShowMenu')">
+      <calcite-icon icon="hamburger" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
 
     <!-- Menu header -->
@@ -19,18 +12,9 @@
 
     <!-- Menu content-->
     <div class="menu__content">
-      <calcite-button
-        @click="goBackHandler"
-        appearance="transparent"
-        class="menu__button menu__button--back"
-        color="red"
-        v-if="currentView != 'SISBIC1' || currentView != 'DEEP1'"
-      >
-        <calcite-icon
-          icon="arrow-bold-left"
-          scale="s"
-          aria-hidden="true"
-        ></calcite-icon>
+      <calcite-button @click="goBackHandler" appearance="transparent" class="menu__button menu__button--back"
+        color="red" v-if="currentView != 'SISBIC1' || currentView != 'DEEP1' || currentView != 'BIBLIO1'">
+        <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
       </calcite-button>
       <!-- Home view -->
       <div v-if="currentView === 'home'" class="route-content">
@@ -41,10 +25,13 @@
         <ViewSICON />
       </div>
       <div v-if="currentView === 'SISBIC1'" class="route-content">
-        <ViewSISBIC @goHome="goBackHandler"/>
+        <ViewSISBIC @goHome="goBackHandler" />
       </div>
       <div v-if="currentView === 'DEEP1'" class="route-content">
-        <ViewDEEP @goHome="goBackHandler"/>
+        <ViewDEEP @goHome="goBackHandler" />
+      </div>
+      <div v-if="currentView === 'BIBLIO1'" class="route-content">
+        <ViewBIBLIO @goHome="goBackHandler" />
       </div>
     </div>
   </div>
@@ -57,7 +44,7 @@ import Home from "../../../../views/menu/Home.vue";
 import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
 import ViewDEEP from "../../../../views/menu/ViewDEEP.vue";
-
+import ViewBIBLIO from "../../../../views/menu/ViewBIBLIO.vue";
 
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
 import "@esri/calcite-components/dist/custom-elements/bundles/icon";
@@ -65,7 +52,7 @@ import "@esri/calcite-components/dist/custom-elements/bundles/input";
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP },
+  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBIBLIO },
   emits: ["routing"],
   props: {
     show: {
@@ -79,7 +66,7 @@ export default defineComponent({
     const goBackHandler = () => currentView.value = 'home';
 
 
-    return { currentView, routingHandler, goBackHandler};
+    return { currentView, routingHandler, goBackHandler };
   },
 });
 </script>

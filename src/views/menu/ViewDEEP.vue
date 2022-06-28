@@ -6,12 +6,13 @@
     </calcite-button>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">DEEP</h2>
-    <h3>Búsqueda por Nombre</h3>
+    <h3>Búsqueda por Localidad y Distrito</h3>
     <div class="mt-3">
       <calcite-label>Localidad
         <calcite-select ref="localidadSelected">
           <calcite-option label="Ninguna" value="notselected" :selected="localidad ? false : true"></calcite-option>
-          <calcite-option v-for="item in localidadItems" :key="item.value" :value="item.value" :label="item.label" :selected="localidad == item.value ? true : false">
+          <calcite-option v-for="item in localidadItems" :key="item.value" :value="item.value" :label="item.label"
+            :selected="localidad == item.value ? true : false">
           </calcite-option>
         </calcite-select>
       </calcite-label>
@@ -19,14 +20,17 @@
     <div class="mt-3">
       <calcite-label>Nombre del distrito</calcite-label>
       <calcite-combobox scale="s" placeholder="Seleccione los distritos">
-        <calcite-combobox-item v-for="item in distritosCreativosItems" :key="item.value" :value="item.value" :selected="comboBoxDistritoSelectedValue.includes(item.value) ? true : false"
-          :text-label="item.label">
+        <calcite-combobox-item v-for="item in distritosCreativosItems" :key="item.value" :value="item.value"
+          :selected="comboBoxDistritoSelectedValue.includes(item.value) ? true : false" :text-label="item.label">
         </calcite-combobox-item>
       </calcite-combobox>
     </div>
     <p class="error" v-if="error">{{ error }}</p>
     <div class="mt-5">
       <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
+    </div>
+    <div class="mt-3">
+      <calcite-button iconStart="reset" color="inverse" width="full" @click="clearClick" :loading="loading">Limpiar</calcite-button>
     </div>
   </div>
   <div v-else>
@@ -121,7 +125,7 @@ export default defineComponent({
       );
     });
 
-    onMounted( () => {
+    onMounted(() => {
       document.addEventListener('calciteLookupChange', (e) => {
         comboBoxDistritoSelectedValue.value = e.detail.map(item => item.value);
         console.log(comboBoxDistritoSelectedValue.value)
@@ -130,8 +134,8 @@ export default defineComponent({
 
     onUnmounted(() => {
       app.view.popup.close();
-      //app.view.map.remove(graphicsLayer);
-      //app.view.map.remove(principalLayer);
+      app.view.map.remove(graphicsLayer);
+      app.view.map.remove(principalLayer);
     });
 
     function generateQueryLocalidades() {
@@ -218,6 +222,40 @@ export default defineComponent({
           dataItems.value = arr;
         });
     }
+
+    function generateByQueryDistritosCreativos() {
+      const arr = [];
+      const symbol = {
+        type: "simple-fill",  // autocasts as new SimpleFillSymbol()
+        color: [51, 51, 204, 0.9],
+        style: "solid",
+        outline: {  // autocasts as new SimpleLineSymbol()
+          color: "white",
+          width: 1
+        }
+      };
+      var queryParamas = principalLayer.createQuery();
+      queryParamas.outFields = ["*"];
+      queryParamas.returnGeometry = true;
+      queryParamas.objectIds = comboBoxDistritoSelectedValue.value;
+      principalLayer.queryFeatures(queryParamas)
+        .then((results) => {
+          for (const feature of results.features) {
+            const graphic = new Graphic({
+              geometry: feature.geometry,
+              attributes: feature.attributes,
+              symbol
+            });
+            arr.push(graphic.attributes);
+            graphicsLayer.add(graphic);
+          }
+          app.view.goTo(graphicsLayer.graphics);
+          loading.value = false;
+        }).then(() => {
+          dataItems.value = arr;
+        });
+    }
+
     function searchClick() {
       graphicsLayer.removeAll();
       if (localidadSelected.value.selectedOption.value == 'notselected' && comboBoxDistritoSelectedValue.value.length === 0) {
@@ -225,16 +263,19 @@ export default defineComponent({
       } else {
         error.value = ''
         app.view.popup.close();
-        //loading.value = true;
-        if (localidadSelected.value.selectedOption.value) {
+        loading.value = true;
+        if (localidadSelected.value.selectedOption.value && localidadSelected.value.selectedOption.value !== 'notselected') {
           localidad.value = localidadSelected.value.selectedOption.value
           queryByLocalidad();
+        } else {
+          generateByQueryDistritosCreativos();
         }
       }
     }
 
     function clearClick() {
-
+      graphicsLayer.removeAll();
+      comboBoxDistritoSelectedValue.value = [];
     }
 
     return {

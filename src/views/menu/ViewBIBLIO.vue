@@ -1,22 +1,11 @@
 <template>
   <div>
     <Loader v-if="loading" menu />
-    <h2 class="menu__title">IDPC</h2>
-    <h3>Búsqueda por CHIP</h3>
-    <div class="mt-3">
-      <calcite-label
-        >Digite el CHIP *
-        <calcite-input></calcite-input>
-      </calcite-label>
-    </div>
+    <h2 class="menu__title">Bibliotecas</h2>
+    <h3>Búsqueda</h3>
     <div class="mt-5">
-      <calcite-button
-        iconStart="search"
-        width="full"
-        @click="searchClick()"
-        :loading="loading"
-        >Buscar</calcite-button
-      >
+      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar posición actual
+      </calcite-button>
     </div>
   </div>
 </template>
@@ -36,7 +25,8 @@ import Graphic from "@arcgis/core/Graphic";
 import * as query from "@arcgis/core/rest/query";
 import Query from "@arcgis/core/rest/support/Query";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
-import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
+import Locate from "@arcgis/core/widgets/Locate";
+//import MapImageLayer from "@arcgis/core/layers/MapImageLayer";
 
 import Chart from "chart.js/auto";
 
@@ -56,7 +46,13 @@ export default defineComponent({
     let chartTitle;
     let layer;
     let graphicsLayer;
-    let bienesLayer;
+    let paraderosLibrosLayer;
+    let puntosLectura;
+    let bibliosEstacionLayer;
+    let biblioComunitariaLayer;
+    let biblioPublicasLayer;
+
+    let locate;
 
     // --- Options for Selects --- //
     let entidadesItems = ref([]);
@@ -86,170 +82,41 @@ export default defineComponent({
       graphicsLayer = new GraphicsLayer();
       app.view.map.add(graphicsLayer);
 
-      bienesLayer = new MapImageLayer({
-        url: "https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/bienesinterescultural/MapServer",
-        sublayers: [
-          {
-            id: 0,
-            visible: true,
-            popupTemplate: {
-              title: "{TITULO_NOM}",
-              actions: [
-                {
-                  id: "action-detail",
-                  title: "Detalle",
-                },
-              ],
-              content: [
-                {
-                  type: "fields",
-                  fieldInfos: [
-                    {
-                      fieldName: "DIRECCION",
-                      label: "Dirección BIC",
-                    },
-                    {
-                      fieldName: "LOCALIDAD",
-                      label: "Nombre de la Localidad",
-                    },
-                    {
-                      fieldName: "UPLNOMBRE",
-                      label: "UPZ",
-                    },
-                    {
-                      fieldName: "SECTOR_CAT",
-                      label: "Sector Catastral",
-                    },
-                    {
-                      fieldName: "LOT_COD",
-                      label: "Código de Lote",
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            id: 1,
-            visible: true,
-            popupTemplate: {
-              title: "{NOMBIC}",
-              content: [
-                {
-                  type: "fields",
-                  fieldInfos: [
-                    {
-                      fieldName: "DIRBIC",
-                      label: "Dirección BIC",
-                    },
-                    {
-                      fieldName: "ACTADMBIC",
-                      label: "Acto Administrativo BIC",
-                    },
-                    {
-                      fieldName: "AMBITOBIC",
-                      label: "Ámbito BIC",
-                    },
-                    {
-                      fieldName: "CATEGORIA",
-                      label: "Categoría BIC fuera del Centro Histórico",
-                    },
-                    {
-                      fieldName: "NOMSIC",
-                      label: "Nombre del Sector de Interés Cultural",
-                    },
-                    {
-                      fieldName: "NOMLOCALIDAD",
-                      label: "Nombre de la Localidad",
-                    },
-                    {
-                      fieldName: "NOMUPZ",
-                      label: "UPZ",
-                    },
-                    {
-                      fieldName: "NOMSECTCAT",
-                      label: "Sector Catastral",
-                    },
-                    {
-                      fieldName: "CODLOTE",
-                      label: "Código de Lote",
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-          {
-            id: 4,
-            visible: true,
-            popupTemplate: {
-              title: "{NOMBRE}",
-              actions: [
-                {
-                  id: "action-detail",
-                  title: "Detalle",
-                },
-              ],
-              content: [
-                {
-                  type: "fields",
-                  fieldInfos: [
-                    {
-                      fieldName: "DIRECCION_DECLARATORIA",
-                      label: "Dirección BIC",
-                    },
-                    {
-                      fieldName: "ACTO_ADMIN",
-                      label: "Acto Administrativo BIC",
-                    },
-                    {
-                      fieldName: "AMBITO",
-                      label: "Ámbito BIC",
-                    },
-                    {
-                      fieldName: "CATEGORIABICNOPEMP",
-                      label: "Categoría BIC fuera del Centro Histórico",
-                    },
-                    {
-                      fieldName: "SIC",
-                      label: "Nombre del Sector de Interés Cultural",
-                    },
-                    {
-                      fieldName: "LOCALIDAD",
-                      label: "Nombre de la Localidad",
-                    },
-                    {
-                      fieldName: "UPZ",
-                      label: "UPZ",
-                    },
-                    {
-                      fieldName: "SECTOR_CATASTRAL",
-                      label: "Sector Catastral",
-                    },
-                    {
-                      fieldName: "CODIGO_LOTE",
-                      label: "Código de Lote",
-                    },
-                    {
-                      fieldName: "OBSERVACION",
-                      label: "Observación",
-                    },
-                  ],
-                },
-              ],
-            },
-          },
-        ],
+      paraderosLibrosLayer = new FeatureLayer({
+        url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/3',
       });
-      app.view.map.add(bienesLayer);
-      const popup = app.view.popup;
-      popup.viewModel.on("trigger-action", (event) => {
-        if (event.action.id === "action-detail") {
-          loading.value = true;
-          const attributes = popup.viewModel.selectedFeature.attributes;
-          generateQueryLotebyCodigoLote(attributes.LOT_COD);
+      app.view.map.add(paraderosLibrosLayer);
+
+      puntosLectura = new FeatureLayer({
+        url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/4',
+      });
+      app.view.map.add(puntosLectura);
+
+      bibliosEstacionLayer = new FeatureLayer({
+        url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/2',
+      });
+      app.view.map.add(bibliosEstacionLayer);
+
+      biblioPublicasLayer = new FeatureLayer({
+        url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/1',
+      });
+      app.view.map.add(biblioPublicasLayer);
+
+      biblioComunitariaLayer = new FeatureLayer({
+        url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/0',
+      });
+      app.view.map.add(biblioComunitariaLayer);
+
+      locate = new Locate({
+        view: app.view,
+        useHeadingEnabled: false,
+        goToOverride: function (view, options) {
+          options.target.scale = 1500; // Override the default map scale
+          return app.view.goTo(options.target);
         }
       });
+
+      generateQueryLotebyCodigoLote();
     });
 
     onUnmounted(() => {
@@ -493,7 +360,7 @@ export default defineComponent({
     }
 
     function generateQueryLotebyCodigoLote(lotcodigo) {
-      loading.value = true;
+      //loading.value = true;
       const queryParamas = new Query({
         outFields: ["PRECHIP"],
         where: "BARMANPRE='" + lotcodigo + "'",
@@ -586,6 +453,14 @@ export default defineComponent({
     }
 
     function searchClick() {
+      locate.locate().then(function (evt) {
+        // Fires after the user's location has been found
+        console.log(evt.position);
+      }).otherwise(function (e) {
+        console.log(e);
+      });
+
+
       app.view.popup.close();
 
       generateQueryLote();
