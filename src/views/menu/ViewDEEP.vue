@@ -21,7 +21,7 @@
       <calcite-label>Nombre del distrito</calcite-label>
       <calcite-combobox scale="s" placeholder="Seleccione los distritos">
         <calcite-combobox-item v-for="item in distritosCreativosItems" :key="item.value" :value="item.value"
-          :selected="comboBoxDistritoSelectedValue.includes(item.value) ? true : false" :text-label="item.label">
+          :selected="distritoSelectedValue.includes(item.value) ? true : false" :text-label="item.label">
         </calcite-combobox-item>
       </calcite-combobox>
     </div>
@@ -30,11 +30,12 @@
       <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
     </div>
     <div class="mt-3">
-      <calcite-button iconStart="reset" color="inverse" width="full" @click="clearClick" :loading="loading">Limpiar</calcite-button>
+      <calcite-button iconStart="reset" color="inverse" width="full" @click="clearClick" :loading="loading">Limpiar
+      </calcite-button>
     </div>
   </div>
   <div v-else>
-    <ViewTable :data="dataItems" @goBack="dataItems = null" />
+    <ViewTable :data="dataItems" @goBack="dataItems = null" @clickEvent="itemClick" />
   </div>
 </template>
 
@@ -62,6 +63,7 @@ export default defineComponent({
   setup() {
     let app;
     let localidadGraphics = [];
+    let distritosGraphics = [];
     let graphicsLayer;
     let principalLayer;
 
@@ -73,7 +75,7 @@ export default defineComponent({
     const localidadSelected = ref();
     const localidad = ref();
     let localidadGraphicSelected;
-    const comboBoxDistritoSelectedValue = ref([])
+    const distritoSelectedValue = ref([])
 
     const loading = ref(false);
 
@@ -83,19 +85,23 @@ export default defineComponent({
       principalLayer = new FeatureLayer({
         url: process.env.VUE_APP_URL_DISTRITOSCREATIVOS,
         popupTemplate: {
-          title: "{NOMBRE}",
+          title: "{nombre}",
           actions: [],
           content: [
             {
               type: "fields",
               fieldInfos: [
                 {
-                  fieldName: "Intervención",
-                  label: "Intervenci",
+                  label: "Acto Jurídico",
+                  fieldName: "reconocido",
                 },
                 {
-                  fieldName: "Nombre",
-                  label: "Nombre",
+                  label: "Área",
+                  fieldName: "area_m2",
+                },
+                {
+                  label: "Perímetro",
+                  fieldName: "perim_m2",
                 },
               ],
             },
@@ -127,8 +133,8 @@ export default defineComponent({
 
     onMounted(() => {
       document.addEventListener('calciteLookupChange', (e) => {
-        comboBoxDistritoSelectedValue.value = e.detail.map(item => item.value);
-        console.log(comboBoxDistritoSelectedValue.value)
+        distritoSelectedValue.value = e.detail.map(item => item.value);
+        console.log(distritoSelectedValue.value)
       });
     });
 
@@ -218,6 +224,7 @@ export default defineComponent({
             graphicsLayer.add(graphic);
           }
           app.view.goTo(graphicsLayer.graphics);
+          loading.value = false;
         }).then(() => {
           dataItems.value = arr;
         });
@@ -234,10 +241,13 @@ export default defineComponent({
           width: 1
         }
       };
+
       var queryParamas = principalLayer.createQuery();
       queryParamas.outFields = ["*"];
       queryParamas.returnGeometry = true;
-      queryParamas.objectIds = comboBoxDistritoSelectedValue.value;
+      queryParamas.objectIds = distritoSelectedValue.value;
+      queryParamas.outSpatialReference = app.view.spatialReference;
+
       principalLayer.queryFeatures(queryParamas)
         .then((results) => {
           for (const feature of results.features) {
@@ -248,6 +258,7 @@ export default defineComponent({
             });
             arr.push(graphic.attributes);
             graphicsLayer.add(graphic);
+            distritosGraphics.push(graphic);
           }
           app.view.goTo(graphicsLayer.graphics);
           loading.value = false;
@@ -257,8 +268,9 @@ export default defineComponent({
     }
 
     function searchClick() {
+      distritosGraphics = [];
       graphicsLayer.removeAll();
-      if (localidadSelected.value.selectedOption.value == 'notselected' && comboBoxDistritoSelectedValue.value.length === 0) {
+      if (localidadSelected.value.selectedOption.value == 'notselected' && distritoSelectedValue.value.length === 0) {
         error.value = 'Por favor digita una opción válida'
       } else {
         error.value = ''
@@ -275,12 +287,24 @@ export default defineComponent({
 
     function clearClick() {
       graphicsLayer.removeAll();
-      comboBoxDistritoSelectedValue.value = [];
+      distritoSelectedValue.value = [];
+      distritosGraphics.value = [];
+    }
+
+    function itemClick(feature) {
+      let result = null;
+      graphicsLayer.graphics.forEach((graphic) => {
+        if (graphic.attributes.OBJECTID === feature.OBJECTID) {
+          result = graphic;
+        }
+      });
+      app.view.goTo(result);
     }
 
     return {
       searchClick,
       clearClick,
+      itemClick,
       localidadGraphics,
       loading,
       localidadItems,
@@ -289,7 +313,7 @@ export default defineComponent({
       dataItems,
       distritosCreativosItems,
       localidad,
-      comboBoxDistritoSelectedValue
+      distritoSelectedValue
     };
   },
 });
