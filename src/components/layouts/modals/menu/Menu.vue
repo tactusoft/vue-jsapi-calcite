@@ -6,8 +6,8 @@
     </calcite-button>
 
     <!-- Menu header -->
-    <div class="menu__header">
-      <calcite-input placeholder="Buscar..." icon="search"></calcite-input>
+    <div class="menu__header" >
+      <calcite-input placeholder="Buscar..." icon="search" v-show="false"></calcite-input>
     </div>
 
     <!-- Menu content-->
@@ -33,6 +33,9 @@
       <div v-if="currentView === 'BIBLIO1'" class="route-content">
         <ViewBIBLIO @goHome="goBackHandler" />
       </div>
+      <div v-if="currentView === 'verMas'" class="route-content">
+        <VerMas @routing="routingHandler($event)" />
+      </div>
     </div>
   </div>
 </template>
@@ -45,14 +48,19 @@ import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
 import ViewDEEP from "../../../../views/menu/ViewDEEP.vue";
 import ViewBIBLIO from "../../../../views/menu/ViewBIBLIO.vue";
+import VerMas from "../../../../views/menu/VerMas.vue";
+
 
 import "@esri/calcite-components/dist/custom-elements/bundles/button";
 import "@esri/calcite-components/dist/custom-elements/bundles/icon";
 import "@esri/calcite-components/dist/custom-elements/bundles/input";
+import "@esri/calcite-components/dist/custom-elements/bundles/accordion";
+import '@esri/calcite-components/dist/custom-elements/bundles/action';
+import '@esri/calcite-components/dist/custom-elements/bundles/pick-list';
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBIBLIO },
+  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBIBLIO, VerMas },
   emits: ["routing"],
   props: {
     show: {
