@@ -5,7 +5,7 @@
     </calcite-button>
     <div class="mt-5">
         <h2>Resultados</h2>
-        <ul class="deepE mt-4" v-if="data.length > 0">
+        <ul class="deepE mt-4" v-if="data?.length > 0">
             <li class="deepE__element" :class="selectedItem === feature.OBJECTID ? 'selected' : ''"
                 v-for="feature in data" :key="feature.OBJECTID" @click="selectedItem = feature.OBJECTID">
                 <div style="flex: 1;">

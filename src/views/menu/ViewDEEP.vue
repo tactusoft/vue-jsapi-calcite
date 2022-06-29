@@ -1,5 +1,5 @@
 <template>
-  <div v-if="!dataItems">
+  <div v-show="!dataItems">
     <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
       color="red">
       <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
@@ -10,9 +10,8 @@
     <div class="mt-3">
       <calcite-label>Localidad
         <calcite-select ref="localidadSelected">
-          <calcite-option label="Ninguna" value="notselected" :selected="localidad ? false : true"></calcite-option>
-          <calcite-option v-for="item in localidadItems" :key="item.value" :value="item.value" :label="item.label"
-            :selected="localidad == item.value ? true : false">
+          <calcite-option label="Ninguna" value="notselected"></calcite-option>
+          <calcite-option v-for="item in localidadItems" :key="item.value" :value="item.value" :label="item.label">
           </calcite-option>
         </calcite-select>
       </calcite-label>
@@ -34,7 +33,7 @@
       </calcite-button>
     </div>
   </div>
-  <div v-else>
+  <div v-show="dataItems">
     <ViewTable :data="dataItems" @goBack="dataItems = null" @clickEvent="itemClick" />
   </div>
 </template>
@@ -73,7 +72,6 @@ export default defineComponent({
     let localidadItems = ref([]);
     let distritosCreativosItems = ref([]);
     const localidadSelected = ref();
-    const localidad = ref();
     let localidadGraphicSelected;
     const distritoSelectedValue = ref([])
 
@@ -126,15 +124,15 @@ export default defineComponent({
       generateQueryLocalidades();
       generateQueryDistritosCreativos();
 
-      localidadSelected.value.addEventListener("calciteSelectChange", () =>
+      localidadSelected.value.addEventListener("calciteSelectChange", () => {
         zoomToLocalidad()
+      }
       );
     });
 
     onMounted(() => {
       document.addEventListener('calciteLookupChange', (e) => {
         distritoSelectedValue.value = e.detail.map(item => item.value);
-        console.log(distritoSelectedValue.value)
       });
     });
 
@@ -277,7 +275,6 @@ export default defineComponent({
         app.view.popup.close();
         loading.value = true;
         if (localidadSelected.value.selectedOption.value && localidadSelected.value.selectedOption.value !== 'notselected') {
-          localidad.value = localidadSelected.value.selectedOption.value
           queryByLocalidad();
         } else {
           generateByQueryDistritosCreativos();
@@ -312,7 +309,6 @@ export default defineComponent({
       error,
       dataItems,
       distritosCreativosItems,
-      localidad,
       distritoSelectedValue
     };
   },
