@@ -101,6 +101,10 @@ export default defineComponent({
                   label: "Perímetro",
                   fieldName: "perim_m2",
                 },
+                {
+                  label: "Localidades",
+                  fieldName: "localidades",
+                },
               ],
             },
           ],

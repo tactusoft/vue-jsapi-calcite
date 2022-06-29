@@ -2,9 +2,9 @@
   <div>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">Bibliotecas</h2>
-    <h3>Búsqueda</h3>
+    <h3>Buscar posición actual</h3>
     <div class="mt-5">
-      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar posición actual
+      <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Tu posición actual
       </calcite-button>
     </div>
   </div>
@@ -47,7 +47,7 @@ export default defineComponent({
     let layer;
     let graphicsLayer;
     let paraderosLibrosLayer;
-    let puntosLectura;
+    let puntosLecturaLayer;
     let bibliosEstacionLayer;
     let biblioComunitariaLayer;
     let biblioPublicasLayer;
@@ -87,10 +87,10 @@ export default defineComponent({
       });
       app.view.map.add(paraderosLibrosLayer);
 
-      puntosLectura = new FeatureLayer({
+      puntosLecturaLayer = new FeatureLayer({
         url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/4',
       });
-      app.view.map.add(puntosLectura);
+      app.view.map.add(puntosLecturaLayer);
 
       bibliosEstacionLayer = new FeatureLayer({
         url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/2',
@@ -121,7 +121,11 @@ export default defineComponent({
 
     onUnmounted(() => {
       app.view.map.remove(graphicsLayer);
-      //app.view.map.remove(bienesLayer);
+      app.view.map.remove(paraderosLibrosLayer);
+      app.view.map.remove(puntosLecturaLayer);
+      app.view.map.remove(bibliosEstacionLayer);
+      app.view.map.remove(biblioPublicasLayer);
+      app.view.map.remove(biblioComunitariaLayer);
     });
 
     async function populateFeatureLayer(arr, reangeArr) {

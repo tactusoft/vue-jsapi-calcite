@@ -2,7 +2,7 @@ export const categories = [{
     id: 1,
     name: 'SICON',
     icon: 'conference-room',
-    description: 'Busca por propuestas, etc...',
+    description: 'Buscar por propuestas, etc...',
     subMenus: [{
         title: "Búsqueda por Propuestas",
         description: "SICON",
@@ -13,7 +13,7 @@ export const categories = [{
     id: 2,
     name: 'SISBIC',
     icon: 'analysis',
-    description: 'Busca por CHIP, conexiones, etc...',
+    description: 'Buscar por CHIP, etc...',
     subMenus: [{
         title: "Búsqueda por CHIP",
         description: "IDPC",
@@ -24,7 +24,7 @@ export const categories = [{
     id: 3,
     name: 'DEEP',
     icon: 'layer-graphics',
-    description: 'Busca por nombre, conexiones, etc...',
+    description: 'Buscar posición actual, etc...',
     subMenus: [{
         title: "Búsqueda por NOMBRE",
         description: "DEEP",
@@ -35,9 +35,9 @@ export const categories = [{
     id: 4,
     name: 'Bibliotecas',
     icon: 'book',
-    description: 'Busca por nombre, conexiones, etc...',
+    description: 'Buscar por nombre, etc...',
     subMenus: [{
-        title: "Búsqueda por NOMBRE",
+        title: "Buscar posición actual",
         description: "BIBLIO",
         route: "BIBLIO1",
       },]

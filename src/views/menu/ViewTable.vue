@@ -7,11 +7,11 @@
         <h2>Resultados</h2>
         <ul class="deepE mt-4" v-if="data?.length > 0">
             <li class="deepE__element" :class="selectedItem === feature.OBJECTID ? 'selected' : ''"
-                v-for="feature in data" :key="feature.OBJECTID" @click="selectedItem = feature.OBJECTID">
+                v-for="feature in data" :key="feature.OBJECTID" @click="clickItem(feature)">
                 <div style="flex: 1;">
                     <p>Distrito creativo <span class="semi-bold">{{ feature.nombre }}</span></p>
-                    <p>Acto juridico : {{ feature.reconocido }}</p>
-                    <p>Localidades : </p>
+                    <p>Acto juridico: {{ feature.reconocido }}</p>
+                    <p>Localidades: {{ feature.localidades }}</p>
                     <div class="flex flex--justify-content-space-between">
                         <p>Area : <span class="semi-bold">{{ feature.area_m2 }}m</span></p>
                         <p>Perimetro : <span class="semi-bold">{{ feature.perim_m2 }}m</span></p>
@@ -34,10 +34,15 @@ import "@esri/calcite-components/dist/custom-elements/bundles/button";
 export default defineComponent({
     name: 'ViewTable',
     props: ['data'],
-    setup(props) {
+    setup() {
         const selectedItem = ref();
-        console.log(props.data);
-        return { selectedItem };
+
+        function clickItem(feature) {
+            selectedItem.value = feature.OBJECTID
+            this.$emit('clickEvent', feature);
+        }
+
+        return { selectedItem, clickItem };
     },
 })
 </script>

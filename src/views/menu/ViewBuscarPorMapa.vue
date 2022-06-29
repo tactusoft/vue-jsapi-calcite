@@ -14,7 +14,7 @@
         </calcite-button>
         <h2 class="menu__title">SISBIC</h2>
         <h3>Búsqueda por Mapa</h3>
-        <a href="https://www.google.com/" target="_blank">Ir a ficha</a>
+        <a href="https://sisbic.idpc.gov.co/inmueble/607" target="_blank">Ir a ficha</a>
         <div class="divider">
             <h2 class="divider__title">Localización</h2>
             <div class="flex flex--justify-content-space-between">
