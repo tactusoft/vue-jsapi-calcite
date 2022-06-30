@@ -12,6 +12,7 @@
 
     <!-- Menu content-->
     <div class="menu__content">
+      <!-- BACK BUTTON -->
       <calcite-button @click="goBackHandler" appearance="transparent" class="menu__button menu__button--back"
         color="red" v-if="currentView != 'SISBIC1' || currentView != 'DEEP1' || currentView != 'BIBLIO1'">
         <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>

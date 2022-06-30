@@ -74,6 +74,7 @@ export default defineComponent({
 });
 </script>
 <style>
+
 :root{
   --calcite-ui-brand: #f9b52c;
   --calcite-ui-brand-hover:#f9b52c;
