@@ -24,9 +24,9 @@ export const categories = [{
     id: 3,
     name: 'DEEP',
     icon: 'layer-graphics',
-    description: 'Buscar posición actual, etc...',
+    description: 'Buscar por Nombre, etc...',
     subMenus: [{
-        title: "Búsqueda por NOMBRE",
+        title: "Búsqueda por Nombre",
         description: "DEEP",
         route: "DEEP1",
       },]
@@ -35,9 +35,9 @@ export const categories = [{
     id: 4,
     name: 'Bibliotecas',
     icon: 'book',
-    description: 'Buscar por nombre, etc...',
+    description: 'Buscar por Posición Actual, etc...',
     subMenus: [{
-        title: "Buscar posición actual",
+        title: "Buscar Posición Actual",
         description: "BIBLIO",
         route: "BIBLIO1",
       },]

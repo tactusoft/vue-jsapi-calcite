@@ -1,16 +1,8 @@
 <template>
   <div v-if="!dataMapa">
-    <calcite-button
-        @click="$emit('goHome')"
-        appearance="transparent"
-        class="menu__button menu__button--back"
-        color="red"
-        >
-        <calcite-icon
-          icon="arrow-bold-left"
-          scale="s"
-          aria-hidden="true"
-        ></calcite-icon>
+    <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
+      color="red">
+      <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
     <Loader v-if="loading" menu />
     <h2 class="menu__title">IDPC</h2>
@@ -20,7 +12,7 @@
         <calcite-input placeholder="A5821722F"></calcite-input>
       </calcite-label>
     </div>
-    <p class="error" v-if="error">{{error }}</p>
+    <p class="error" v-if="error">{{ error }}</p>
     <div class="mt-5">
       <calcite-button iconStart="search" width="full" @click="searchClick()" :loading="loading">Buscar</calcite-button>
     </div>
@@ -56,6 +48,7 @@ export default defineComponent({
     let graphicsLayer;
     let layerBIC;
     let layerBICNOPEMP;
+    let clase;
 
     const loading = ref(false);
     const chip = ref('');
@@ -69,7 +62,7 @@ export default defineComponent({
       app.view.map.add(graphicsLayer);
 
       layerBIC = new FeatureLayer({
-        url: process.env.VUE_APP_URL_IDPC+'0',
+        url: process.env.VUE_APP_URL_IDPC + '0',
         lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
@@ -111,7 +104,7 @@ export default defineComponent({
       app.view.map.add(layerBIC);
 
       layerBICNOPEMP = new FeatureLayer({
-        url: process.env.VUE_APP_URL_IDPC+'1',
+        url: process.env.VUE_APP_URL_IDPC + '1',
         lastEditInfoEnabled: false,
         popupTemplate: {
           title: "{NOMBRE}",
@@ -224,10 +217,14 @@ export default defineComponent({
       })
         .then(function (response) {
           if (response.data.length > 0) {
+            clase = 'inmueblenopemp';
             let item = response.data[0];
             let urlApi = item.ruta.replace(/\\/g, '');
             if (urlApi.indexOf('inmueblenopemp') < 0) {
-              urlApi = urlApi.replace('inmueble', 'inmuebletotal');
+              clase = 'inmueble';
+              if (urlApi.indexOf('inmuebletotal') < 0) {
+                urlApi = urlApi.replace('inmueble', 'inmuebletotal');
+              }
             }
             axios({
               method: "get",
@@ -236,6 +233,7 @@ export default defineComponent({
               .then(function (responseDetail) {
                 if (responseDetail.data.length > 0) {
                   dataMapa.value = responseDetail.data[0]
+                  dataMapa.value.clase = clase;
                 }
                 loading.value = false;
               })
@@ -255,9 +253,9 @@ export default defineComponent({
     }
 
     function searchClick() {
-      if(chip.value == '') {
+      if (chip.value == '') {
         error.value = 'Parece que has enviado el chip de manera incorrecta...'
-      }else{
+      } else {
         error.value = '';
         app.view.popup.close();
         loading.value = true;
@@ -266,10 +264,10 @@ export default defineComponent({
     }
 
     function clearClick() {
-      
+
     }
 
-    onMounted( () => {
+    onMounted(() => {
       document.addEventListener('calciteInputChange', (e) => {
         chip.value = e.target.value
       })
