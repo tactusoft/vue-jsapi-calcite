@@ -1,6 +1,6 @@
 <template>
     <h2 class="menu__title">Categorías</h2>
-    <calcite-accordion scale="l" selection-mode="single">
+    <calcite-accordion scale="l" selection-mode="single" style="margin-top: 25px;">
           <calcite-accordion-item v-for="category in categories" :key="category.id"  :icon="category.icon" :item-title="category.name"
               :item-subtitle="category.description">
                 <calcite-pick-list style="padding-top: 20px; padding-bottom: 20px">

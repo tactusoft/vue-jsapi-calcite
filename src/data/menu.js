@@ -42,6 +42,5 @@ export const categories = [{
         route: "BIBLIO1",
       },]
 }
-
 ]
 
