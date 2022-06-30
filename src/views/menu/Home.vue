@@ -47,7 +47,7 @@ export default defineComponent({
 
     const DEEPMenu1 = [
       {
-        title: "Búsqueda por NOMBRE",
+        title: "Búsqueda por Localidad y Distrito",
         description: "DEEP",
         route: "DEEP1",
       },

@@ -9,13 +9,9 @@
             <li class="deepE__element" :class="selectedItem === feature.OBJECTID ? 'selected' : ''"
                 v-for="feature in data" :key="feature.OBJECTID" @click="clickItem(feature)">
                 <div style="flex: 1;">
-                    <p>Distrito creativo <span class="semi-bold">{{ feature.nombre }}</span></p>
-                    <p>Acto juridico: {{ feature.reconocido }}</p>
-                    <p>Localidades: {{ feature.localidades }}</p>
-                    <div class="flex flex--justify-content-space-between">
-                        <p>Area : <span class="semi-bold">{{ feature.area_m2 }}m</span></p>
-                        <p>Perimetro : <span class="semi-bold">{{ feature.perim_m2 }}m</span></p>
-                    </div>
+                    <p>Nombre <span class="semi-bold">{{ feature.LecNombre }}</span></p>
+                    <p>Dirección: {{ feature.LecDirecci }}</p>
+                    <p>Localidad: {{ feature.LecNomLoc }}</p>
                 </div>
                 <calcite-icon :icon="selectedItem == feature.OBJECTID ? 'check-square' : 'square'"></calcite-icon>
             </li>
@@ -24,6 +20,7 @@
             <h3>No se encontraron resultados</h3>
         </div>
     </div>
+
 </template>
 <script>
 
