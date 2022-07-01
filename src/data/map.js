@@ -7,7 +7,7 @@ import Print from '@arcgis/core/widgets/Print';
 import Home from '@arcgis/core/widgets/Home';
 //import ScaleBar from '@arcgis/core/widgets/ScaleBar';
 import Locate from '@arcgis/core/widgets/Locate';
-//import Search from '@arcgis/core/widgets/Search';
+import Search from '@arcgis/core/widgets/Search';
 
 config.assetsPath = './assets';
 
@@ -35,7 +35,7 @@ view.ui.add(legend, 'bottom-left');
 view.ui.add(new Home({ id: "homeWidget", view }), 'top-left');
 view.ui.add(new Locate({ view }), 'top-left');
 //view.ui.add(new ScaleBar({ id: "scaleBarWidget", view, style: 'ruler' }), 'bottom-right');
-//view.ui.add(new Search({ view }), 'bottom-trailing');
+view.ui.add(new Search({ view }), 'manual');
 
 /**
  * Assigns the container element to the View
