@@ -11,7 +11,7 @@
 
 <script>
 import interact from "interactjs";
-import "@esri/calcite-components/dist/custom-elements/bundles/button";
+import "@esri/calcite-components/dist/components/calcite-button";
 
 export default {
   name: "Print",

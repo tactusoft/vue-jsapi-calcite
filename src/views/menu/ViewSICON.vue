@@ -104,10 +104,10 @@
 <script>
 import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 
-import "@esri/calcite-components/dist/custom-elements/bundles/input";
-import "@esri/calcite-components/dist/custom-elements/bundles/select";
-import "@esri/calcite-components/dist/custom-elements/bundles/switch";
-import "@esri/calcite-components/dist/custom-elements/bundles/button";
+import "@esri/calcite-components/dist/components/calcite-input";
+import "@esri/calcite-components/dist/components/calcite-select";
+import "@esri/calcite-components/dist/components/calcite-switch";
+import "@esri/calcite-components/dist/components/calcite-button";
 import Loader from "@/components/layouts/Loader.vue";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";

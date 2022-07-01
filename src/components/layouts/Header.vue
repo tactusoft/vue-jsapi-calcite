@@ -20,7 +20,7 @@
 
 <script>
 import { defineComponent } from "vue";
-import "@esri/calcite-components/dist/custom-elements/bundles/icon";
+import "@esri/calcite-components/dist/components/calcite-icon";
 
 export default defineComponent({
   name: "Header",

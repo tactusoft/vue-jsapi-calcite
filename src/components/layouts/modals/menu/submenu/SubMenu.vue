@@ -13,7 +13,7 @@
 <script>
 import { defineComponent } from "vue";
 import ListItem from "./ListItem.vue";
-import "@esri/calcite-components/dist/custom-elements/bundles/pick-list";
+import "@esri/calcite-components/dist/components/calcite-pick-list";
 
 export default defineComponent({
   name: "SubMenu",

@@ -28,8 +28,8 @@
 <script>
 
 import { defineComponent, ref } from 'vue'
-import "@esri/calcite-components/dist/custom-elements/bundles/icon";
-import "@esri/calcite-components/dist/custom-elements/bundles/button";
+import "@esri/calcite-components/dist/components/calcite-icon";
+import "@esri/calcite-components/dist/components/calcite-button";
 
 export default defineComponent({
     name: 'ViewTable',

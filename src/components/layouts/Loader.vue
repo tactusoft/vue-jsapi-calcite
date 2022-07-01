@@ -6,7 +6,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import '@esri/calcite-components/dist/custom-elements/bundles/loader';
+import '@esri/calcite-components/dist/components/calcite-loader';
 
 export default defineComponent({
     name: 'Loader',

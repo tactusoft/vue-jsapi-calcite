@@ -4,11 +4,7 @@
       <Header @toggleShowMenu="toggleShowMenuHandler" />
     </slot>
     <div v-if="!loading">
-      <button
-        @click="togglePrintHandler"
-        class="button-print esri-widget--button"
-        style="display: none"
-      >
+      <button @click="togglePrintHandler" class="button-print esri-widget--button" style="display: none">
         <calcite-icon icon="print" scale="m" aria-hidden="true"></calcite-icon>
       </button>
       <Menu @toggleShowMenu="toggleShowMenuHandler" :show="showMenu" />
@@ -24,16 +20,22 @@
 <script>
 import { defineComponent, ref } from "vue";
 import "./assets/styles/styles.scss";
-import { commitAssetPath } from "@arcgis/core/widgets/support/componentsUtils";
 import Header from "./components/layouts/Header.vue";
 import Menu from "./components/layouts/modals/menu/Menu.vue";
 import Loader from "./components/layouts/Loader.vue";
 import WebMap from "./components/WebMap.vue";
 import Print from "./components/layouts/modals/Print.vue";
-import "@esri/calcite-components/dist/custom-elements/bundles/shell";
-import "@esri/calcite-components/dist/custom-elements/bundles/icon";
+import "@esri/calcite-components/dist/components/calcite-shell";
+import "@esri/calcite-components/dist/components/calcite-icon";
 
-commitAssetPath();
+import {
+  applyPolyfills,
+  defineCustomElements
+} from '@esri/calcite-components/dist/loader';
+
+applyPolyfills().then(() => {
+  defineCustomElements(window);
+});
 
 export default defineComponent({
   name: "App",
@@ -74,10 +76,10 @@ export default defineComponent({
 });
 </script>
 <style>
-
-:root{
+:root {
   --calcite-ui-brand: #f9b52c;
-  --calcite-ui-brand-hover:#f9b52c;
+  --calcite-ui-brand-hover: #f9b52c;
   --calcite-ui-brand-press: #f9b52c;
 }
 </style>
+<style src="@esri/calcite-components/dist/calcite/calcite.css"></style>

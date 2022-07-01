@@ -11,8 +11,8 @@
 
 <script>
 import { defineComponent } from "vue";
-import "@esri/calcite-components/dist/custom-elements/bundles/button";
-import "@esri/calcite-components/dist/custom-elements/bundles/link";
+import "@esri/calcite-components/dist/components/calcite-button";
+import "@esri/calcite-components/dist/components/calcite-link";
 
 export default defineComponent({
   name: "Categorías",

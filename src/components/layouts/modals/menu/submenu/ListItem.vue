@@ -8,8 +8,8 @@
 <script>
 import { defineComponent } from 'vue'
 import {useRoutes} from '@/store/useRoutes.js'
-import '@esri/calcite-components/dist/custom-elements/bundles/action';
-import '@esri/calcite-components/dist/custom-elements/bundles/pick-list';
+import '@esri/calcite-components/dist/components/calcite-action';
+import '@esri/calcite-components/dist/components/calcite-pick-list';
 
 export default defineComponent({
     name: 'ListItem',

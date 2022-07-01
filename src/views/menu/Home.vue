@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import "@esri/calcite-components/dist/custom-elements/bundles/link";
+import "@esri/calcite-components/dist/components/calcite-link";
 import { defineComponent, ref } from "vue";
 import {useRoutes} from '@/store/useRoutes.js';
 import Category from "@/components/layouts/modals/menu/Category.vue";

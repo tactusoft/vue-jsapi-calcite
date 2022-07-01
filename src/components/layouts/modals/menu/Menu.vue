@@ -58,12 +58,12 @@ import ViewBIBLIO from "../../../../views/menu/ViewBIBLIO.vue";
 import VerMas from "../../../../views/menu/VerMas.vue";
 
 
-import "@esri/calcite-components/dist/custom-elements/bundles/button";
-import "@esri/calcite-components/dist/custom-elements/bundles/icon";
-import "@esri/calcite-components/dist/custom-elements/bundles/input";
-import "@esri/calcite-components/dist/custom-elements/bundles/accordion";
-import '@esri/calcite-components/dist/custom-elements/bundles/action';
-import '@esri/calcite-components/dist/custom-elements/bundles/pick-list';
+import "@esri/calcite-components/dist/components/calcite-button";
+import "@esri/calcite-components/dist/components/calcite-icon";
+import "@esri/calcite-components/dist/components/calcite-input";
+import "@esri/calcite-components/dist/components/calcite-accordion";
+import '@esri/calcite-components/dist/components/calcite-action';
+import '@esri/calcite-components/dist/components/calcite-pick-list';
 
 export default defineComponent({
   name: "Menu",
