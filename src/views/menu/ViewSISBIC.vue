@@ -9,7 +9,7 @@
     <h3>Búsqueda por CHIP</h3>
     <div class="mt-3">
       <calcite-label>Digite el CHIP *
-        <calcite-input placeholder="A5821722F"></calcite-input>
+        <calcite-input placeholder="AAA0032OLXR"></calcite-input>
       </calcite-label>
     </div>
     <p class="error" v-if="error">{{ error }}</p>
@@ -269,6 +269,7 @@ export default defineComponent({
 
     onMounted(() => {
       document.addEventListener('calciteInputChange', (e) => {
+        console.log(e.target.value)
         chip.value = e.target.value
       })
     })

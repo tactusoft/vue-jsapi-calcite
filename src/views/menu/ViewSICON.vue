@@ -9,7 +9,6 @@
         <calcite-select ref="anioSelected">
           <calcite-option
             label="-- Seleccione --"
-            selected
             disabled
             :value="-1"
           ></calcite-option>
@@ -18,7 +17,7 @@
             :key="item.value"
             :value="item.value"
             :label="item.label"
-          ></calcite-option>
+          />
         </calcite-select>
       </calcite-label>
     </div>
@@ -183,9 +182,10 @@ export default defineComponent({
       for (let year = from; year <= currentYear; year++) {
         anioItems.value.push({
           value: year,
-          label: year.toString(),
+          label: year
         });
       }
+      console.log(anioItems.value)
     }
 
     async function setEstado() {
