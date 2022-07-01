@@ -72,4 +72,11 @@ body {
 .p-relative {
   position: relative;
 }
-
+.esri-search__container{
+  display: flex;
+  align-items: center;
+}
+.esri-search__submit-button.esri-widget--button{
+  background: transparent !important;
+  border: none !important;
+}
