@@ -87,4 +87,12 @@ $calcite-fonts-path: "./assets/esri/themes/base/fonts/fonts/" !default;
     width: 100%;
     height: 100%;
 }
+
+.esri-search {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
+}
 </style>
