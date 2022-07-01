@@ -86,11 +86,11 @@ export default defineComponent({
     onMounted( () => {
 
       searchInput.value.addEventListener( 'calciteInputInput', (e) => {
-        if (e.target.value.trim() === '') routes.currentRoute = 'verMas';
-        else {
-          routes.changeRoute('verMasSearch');
-          categories.filterByKeyword(e.target.value)
-        } 
+          if (e.target.value.trim() === '') routes.currentRoute = 'verMas';
+          else {
+            routes.changeRoute('verMasSearch');
+            categories.filterByKeyword(e.target.value)
+          } 
       })
     });
 

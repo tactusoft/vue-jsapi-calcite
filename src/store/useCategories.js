@@ -11,8 +11,15 @@ export const useCategories = defineStore('categories', {
       filterByKeyword (keyword) {
         this.categoriesFiltered = this.AllCategories
         this.categoriesFiltered = this.AllCategories.filter((cat) => {
-          return cat.name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1
+          return cat.name.toLowerCase().includes(keyword.toLowerCase());
         })
+      },
+      filterByKeyword1(keyword) {
+        this.categoriesFiltered = this.AllCategories
+        this.categoriesFiltered = this.AllCategories.filter(category => {
+          const arr = category.name.toLowerCase().split(' ');
+          return arr.some(y => keyword.toLowerCase().includes(y))
+        });
       }
     }
 })
