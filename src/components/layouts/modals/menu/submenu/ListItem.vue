@@ -1,6 +1,6 @@
 <template>
     <!-- eslint-disable --> 
-    <calcite-pick-list-item :label="title" :description="description" value="rivers" @click="routingHandler" disabled>
+    <calcite-pick-list-item :label="title" :description="description" value="rivers" @click="routingHandler">
         <calcite-action slot="actions-end" :icon="icon"></calcite-action>
     </calcite-pick-list-item>
 </template>
