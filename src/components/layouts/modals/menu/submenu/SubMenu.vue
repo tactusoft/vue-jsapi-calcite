@@ -6,7 +6,6 @@
       :title="item.title"
       :description="item.description"
       :route="item.route"
-      @routing="routingHandler($event)"
     />
   </calcite-pick-list>
 </template>
@@ -24,15 +23,6 @@ export default defineComponent({
         type: Array,
         required: true,
     } 
-  },
-  emits: ["routing"],
-  setup(props, { emit }) {
-    console.log(props.subMenu)
-    const routingHandler = (route) => {
-      emit("routing", route);
-    };
-
-    return { routingHandler };
   },
 });
 </script>

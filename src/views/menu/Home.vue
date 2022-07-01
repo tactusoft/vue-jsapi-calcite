@@ -9,18 +9,19 @@
       <Category :color="currentMenuName === 'DEEP' ? 'blue' : 'inverse'" icon="layer-graphics" text="DEEP"
         menuName="DEEP" @routingMenu="menuHandler($event)" />
     </div>
-    <a style="float: right; padding-right: 20px; color: #1f74a7; text-decoration: underline; margin-top: 25px; cursor: pointer;" @click="routingHandler('verMas')">Ver más categorías</a>
+    <a style="float: right; padding-right: 20px; color: #1f74a7; text-decoration: underline; margin-top: 25px; cursor: pointer;" @click="routes.changeRoute('verMas')">Ver más categorías</a>
   </div>
   <div class="menu__content__list">
-    <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'SICON'" :subMenu="SICONSubMenu" />
-    <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'SISBIC'" :subMenu="SISBICMenu1" />
-    <SubMenu @routing="routingHandler($event)" v-if="currentMenuName === 'DEEP'" :subMenu="DEEPMenu1" />
+    <SubMenu v-if="currentMenuName === 'SICON'" :subMenu="SICONSubMenu" />
+    <SubMenu v-if="currentMenuName === 'SISBIC'" :subMenu="SISBICMenu1" />
+    <SubMenu v-if="currentMenuName === 'DEEP'" :subMenu="DEEPMenu1" />
   </div>
 </template>
 
 <script>
 import "@esri/calcite-components/dist/custom-elements/bundles/link";
 import { defineComponent, ref } from "vue";
+import {useRoutes} from '@/store/useRoutes.js';
 import Category from "@/components/layouts/modals/menu/Category.vue";
 import SubMenu from "@/components/layouts/modals/menu/submenu/SubMenu.vue";
 
@@ -28,7 +29,8 @@ export default defineComponent({
   name: "Home",
   components: { Category, SubMenu },
   emits: ["routingMenu", "routing"],
-  setup(_, { emit }) {
+  setup() {
+    const routes = useRoutes();
     const SICONSubMenu = [
       {
         title: "Búsqueda por Propuestas",
@@ -62,19 +64,16 @@ export default defineComponent({
     ];
 
     const currentMenuName = ref("SICON");
-
-    const routingHandler = (route) => emit("routing", route);
-
     const menuHandler = (menu) => (currentMenuName.value = menu);
 
     return {
-      routingHandler,
       currentMenuName,
       menuHandler,
       SICONSubMenu,
       SISBICMenu1,
       DEEPMenu1,
       BIBLIOMenu1,
+      routes
     };
   },
 });

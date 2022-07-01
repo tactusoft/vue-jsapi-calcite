@@ -7,42 +7,48 @@
 
     <!-- Menu header -->
     <div class="menu__header" >
-      <calcite-input placeholder="Buscar..." icon="search" v-show="false"></calcite-input>
+      <calcite-input placeholder="Buscar..." icon="search" ref="searchInput" :disabled="routes.currentRoute != 'home' && routes.currentRoute != 'verMas' && routes.currentRoute != 'verMasSearch'"></calcite-input>
     </div>
 
     <!-- Menu content-->
     <div class="menu__content">
       <!-- BACK BUTTON -->
       <calcite-button @click="goBackHandler" appearance="transparent" class="menu__button menu__button--back"
-        color="red" v-if="currentView != 'SISBIC1' || currentView != 'DEEP1' || currentView != 'BIBLIO1'">
+        color="red" v-if="routes.currentRoute != 'SISBIC1' || routes.currentRoute != 'DEEP1' || routes.currentRoute != 'BIBLIO1'">
         <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
       </calcite-button>
       <!-- Home view -->
-      <div v-if="currentView === 'home'" class="route-content">
+      <div v-if="routes.currentRoute === 'home'" class="route-content">
         <Home @routing="routingHandler($event)" />
       </div>
       <!-- Some more views-->
-      <div v-if="currentView === 'SICON'" class="route-content">
+      <div v-if="routes.currentRoute === 'SICON'" class="route-content">
         <ViewSICON />
       </div>
-      <div v-if="currentView === 'SISBIC1'" class="route-content">
+      <div v-if="routes.currentRoute === 'SISBIC1'" class="route-content">
         <ViewSISBIC @goHome="goBackHandler" />
       </div>
-      <div v-if="currentView === 'DEEP1'" class="route-content">
+      <div v-if="routes.currentRoute === 'DEEP1'" class="route-content">
         <ViewDEEP @goHome="goBackHandler" />
       </div>
-      <div v-if="currentView === 'BIBLIO1'" class="route-content">
+      <div v-if="routes.currentRoute === 'BIBLIO1'" class="route-content">
         <ViewBIBLIO @goHome="goBackHandler" />
       </div>
-      <div v-if="currentView === 'verMas'" class="route-content">
-        <VerMas @routing="routingHandler($event)" />
+      <div v-if="routes.currentRoute === 'verMas'" class="route-content">
+        <VerMas />
+      </div>
+      <div v-if="routes.currentRoute === 'verMasSearch'" class="route-content">
+        <VerMas :search="true"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
+import {useRoutes} from '@/store/useRoutes.js';
+import {useCategories} from '@/store/useCategories.js'
+
 
 import Home from "../../../../views/menu/Home.vue";
 import ViewSICON from "../../../../views/menu/ViewSICON.vue";
@@ -70,12 +76,25 @@ export default defineComponent({
     },
   },
   setup() {
-    const currentView = ref("home");
-    const routingHandler = (route) => currentView.value = route;
-    const goBackHandler = () => currentView.value = 'home';
+    const searchInput = ref();
+    const routes = useRoutes();
+    const categories = useCategories();
+    const routingHandler = (route) => routes.changeRoute(route)
+    const goBackHandler = () => routes.changeRoute('home')
 
 
-    return { currentView, routingHandler, goBackHandler };
+    onMounted( () => {
+
+      searchInput.value.addEventListener( 'calciteInputInput', (e) => {
+        if (e.target.value.trim() === '') routes.currentRoute = 'verMas';
+        else {
+          routes.changeRoute('verMasSearch');
+          categories.filterByKeyword(e.target.value)
+        } 
+      })
+    });
+
+    return { routingHandler, goBackHandler, searchInput, routes };
   },
 });
 </script>
