@@ -13,7 +13,7 @@
                     <p>Acto juridico: {{ feature.reconocido }}</p>
                     <p>Localidades: {{ feature.localidades }}</p>
                     <div class="flex flex--justify-content-space-between">
-                        <p>Area : <span class="semi-bold">{{ feature.area_m2 }}m</span></p>
+                        <p>Area : <span class="semi-bold">{{ feature.area_m2 }} m2</span></p>
                         <p>Perimetro : <span class="semi-bold">{{ feature.perim_m2 }}m</span></p>
                     </div>
                 </div>

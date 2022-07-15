@@ -130,8 +130,7 @@ export default defineComponent({
 
       localidadSelected.value.addEventListener("calciteSelectChange", () => {
         zoomToLocalidad()
-      }
-      );
+      });
     });
 
     onMounted(() => {

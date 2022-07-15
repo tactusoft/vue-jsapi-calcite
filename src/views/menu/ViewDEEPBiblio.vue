@@ -1,22 +1,27 @@
 <template>
   <div v-show="!dataItems">
+    <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
+      color="red">
+      <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
+    </calcite-button>
     <Loader v-if="loading" menu />
-    <h2 class="menu__title">Bibliotecas</h2>
-    <h3>Buscar por Posición Actual</h3>
+    <h2 class="menu__title">DEEP</h2>
+    <h3>Búsqueda de Bibliotecas por Distritos</h3>
     <div class="mt-3">
-      <p>Al hacer click en el botón, busca lugares de su posición actual.</p>
+      <calcite-label>Nombre del distrito</calcite-label>
+      <calcite-select ref="distritoSelectedValue">
+        <calcite-option label="Ninguna" value="notselected"></calcite-option>
+        <calcite-option v-for="item in distritosCreativosItems" :key="item.value" :value="item.value"
+          :label="item.label">
+        </calcite-option>
+      </calcite-select>
     </div>
-    <div class="mt-3">
-      <calcite-label>Kilómetros a la redonda
-        <calcite-select ref="kmSelected">
-          <calcite-option value="1" label="1"></calcite-option>
-          <calcite-option value="5" label="5"></calcite-option>
-          <calcite-option value="10" label="10"></calcite-option>
-        </calcite-select>
-      </calcite-label>
-    </div>
+    <p class="error" v-if="error">{{ error }}</p>
     <div class="mt-5">
-      <calcite-button iconStart="gps-on" width="full" @click="searchClick()" :loading="loading">Tu posición actual
+      <calcite-button iconStart="search" width="full" @click="searchClick" :loading="loading">Buscar</calcite-button>
+    </div>
+    <div class="mt-3">
+      <calcite-button iconStart="reset" color="inverse" width="full" @click="clearClick" :loading="loading">Limpiar
       </calcite-button>
     </div>
   </div>
@@ -32,47 +37,106 @@ import "@esri/calcite-components/dist/components/calcite-input";
 import "@esri/calcite-components/dist/components/calcite-select";
 import "@esri/calcite-components/dist/components/calcite-switch";
 import "@esri/calcite-components/dist/components/calcite-button";
+import "@esri/calcite-components/dist/components/calcite-combobox";
+
 import Loader from "@/components/layouts/Loader.vue";
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import GraphicsLayer from "@arcgis/core/layers/GraphicsLayer";
+import * as query from "@arcgis/core/rest/query";
+import Query from "@arcgis/core/rest/support/Query";
 import Graphic from "@arcgis/core/Graphic";
-import Locate from "@arcgis/core/widgets/Locate";
-import Point from "@arcgis/core/geometry/Point";
-import Query from '@arcgis/core/rest/support/Query';
-
-import * as query from '@arcgis/core/rest/query';
-import * as geometryEngine from "@arcgis/core/geometry/geometryEngine";
-import * as webMercatorUtils from "@arcgis/core/geometry/support/webMercatorUtils";
-import * as popupUtils from "@arcgis/core/support/popupUtils";
-
 import ViewTableBIBLIO from "./ViewTableBIBLIO.vue";
 
+import * as popupUtils from "@arcgis/core/support/popupUtils";
+
 export default defineComponent({
-  name: "ViewBIBLIO",
+  name: "ViewDCBiblio",
   components: { Loader, ViewTableBIBLIO },
   setup() {
-    const dataItems = ref();
-
     let app;
+    let distritosGraphics = [];
     let graphicsLayer;
+    let principalLayer;
     let paraderosLibrosLayer;
-    //let puntosLecturaLayer;
-    let bibliosEstacionLayer;
-    //let biblioComunitariaLayer;
     let biblioPublicasLayer;
-    let locate;
+    let bibliosEstacionLayer;
     let featuresResults = [];
 
-    let kmSelected = ref();
+    // --- Options for Selects --- //
+    const error = ref();
+    const dataItems = ref();
+    let distritosCreativosItems = ref([]);
+    const distritoSelectedValue = ref([])
+    let distritoGraphicSelected;
 
     const loading = ref(false);
 
     onMounted(async () => {
       app = await import("../../data/map");
+
+      principalLayer = new FeatureLayer({
+        url: process.env.VUE_APP_URL_DISTRITOSCREATIVOS,
+        popupTemplate: {
+          title: "{nombre}",
+          actions: [],
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  label: "Acto Jurídico",
+                  fieldName: "reconocido",
+                },
+                {
+                  label: "Área",
+                  fieldName: "area_m2",
+                },
+                {
+                  label: "Perímetro",
+                  fieldName: "perim_m2",
+                },
+                {
+                  label: "Localidades",
+                  fieldName: "localidades",
+                },
+              ],
+            },
+          ],
+        },
+      });
+      app.view.map.add(principalLayer);
+
+      principalLayer
+        .when(() => {
+          const query = principalLayer.createQuery();
+          query.outSpatialReference = app.view.spatialReference;
+          return principalLayer.queryExtent(query);
+        })
+        .then((response) => {
+          app.view.goTo(response.extent);
+        });
+
       graphicsLayer = new GraphicsLayer();
       app.view.map.add(graphicsLayer);
 
+      loadLayersBiblio();
+      generateQueryDistritosCreativos();
+    });
+
+    onMounted(() => {
+      distritoSelectedValue.value.addEventListener("calciteSelectChange", () => {
+        zoomToDistrito()
+      });
+    });
+
+    onUnmounted(() => {
+      app.view.popup.close();
+      app.view.map.remove(graphicsLayer);
+      app.view.map.remove(principalLayer);
+    });
+
+    function loadLayersBiblio() {
       paraderosLibrosLayer = new FeatureLayer({
         url: process.env.VUE_APP_URL_PARADEROSLIBROS,
       });
@@ -88,29 +152,12 @@ export default defineComponent({
       });
       app.view.map.add(bibliosEstacionLayer);
 
-      /* puntosLecturaLayer = new FeatureLayer({
-         url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/4',
-       });
-       app.view.map.add(puntosLecturaLayer);
- 
-       biblioComunitariaLayer = new FeatureLayer({
-         url: 'https://serviciosgis.catastrobogota.gov.co/arcgis/rest/services/recreaciondeporte/lectura/MapServer/0',
-       });
-       app.view.map.add(biblioComunitariaLayer);*/
-
       app.view.whenLayerView(paraderosLibrosLayer).then(() => {
         const popupTemplate = createMyPopupTemplate(paraderosLibrosLayer)
         if (popupTemplate) {
           paraderosLibrosLayer.popupTemplate = popupTemplate;
         }
       });
-
-      /*  app.view.whenLayerView(puntosLecturaLayer).then(() => {
-          const popupTemplate = createMyPopupTemplate(puntosLecturaLayer)
-          if (popupTemplate) {
-            puntosLecturaLayer.popupTemplate = popupTemplate;
-          }
-        });*/
 
       app.view.whenLayerView(bibliosEstacionLayer).then(() => {
         const popupTemplate = createMyPopupTemplate(bibliosEstacionLayer)
@@ -125,33 +172,7 @@ export default defineComponent({
           biblioPublicasLayer.popupTemplate = popupTemplate;
         }
       });
-
-      /* app.view.whenLayerView(biblioComunitariaLayer).then(() => {
-          const popupTemplate = createMyPopupTemplate(biblioComunitariaLayer)
-          if (popupTemplate) {
-            biblioComunitariaLayer.popupTemplate = popupTemplate;
-          }
-        });*/
-
-      locate = new Locate({
-        view: app.view,
-        useHeadingEnabled: false,
-        goToOverride: function (view, options) {
-          options.target.scale = 1500; // Override the default map scale
-          return app.view.goTo(options.target);
-        }
-      });
-    });
-
-    onUnmounted(() => {
-      app.view.map.remove(graphicsLayer);
-      app.view.map.remove(paraderosLibrosLayer);
-      //app.view.map.remove(puntosLecturaLayer);
-      app.view.map.remove(bibliosEstacionLayer);
-      app.view.map.remove(biblioPublicasLayer);
-      //app.view.map.remove(biblioComunitariaLayer);
-      clearGraphics();
-    });
+    }
 
     function createMyPopupTemplate(layer) {
       const config = {
@@ -167,67 +188,38 @@ export default defineComponent({
       return popupUtils.createPopupTemplate(config);
     }
 
-    function searchClick() {
-      clearGraphics();
-      app.view.popup.close();
-      loading.value = true;
-      locate.locate().then(function (location) {
-        const point = webMercatorUtils.geographicToWebMercator(new Point(location.coords.longitude, location.coords.latitude));
-        bufferPoint(point);
-      }).catch((e) => {
-        loading.value = false;
-        console.log(e);
+    function generateQueryDistritosCreativos() {
+      const queryParamas = new Query({
+        outFields: ["*"],
+        returnGeometry: true,
+        where: "1=1",
+        outSpatialReference: app.view.spatialReference,
       });
+      query
+        .executeQueryJSON(process.env.VUE_APP_URL_DISTRITOSCREATIVOS, queryParamas)
+        .then((results) => {
+          for (const feature of results.features) {
+            const graphic = new Graphic({
+              geometry: feature.geometry,
+              attributes: feature.attributes
+            });
+            distritosGraphics.push(graphic);
+
+            distritosCreativosItems.value.push({
+              value: feature.attributes.OBJECTID.toString(),
+              label: feature.attributes.nombre,
+            });
+          }
+        });
     }
 
-    function clearClick() {
-    }
-
-    function itemClick(feature) {
-      app.view.popup.close();
-      const result = featuresResults.filter(item => item.attributes.OBJECTID === feature.OBJECTID && item.attributes.tipo === feature.tipo);
-      const graphic = result[0];
-      graphic.popupTemplate = createMyPopupTemplate(graphic.layer);
-      app.view.popup.open({
-        location: graphic.geometry,
-        features: [graphic]
-      });
-      app.view.goTo(graphic);
-      console.log(graphic.geometry);
-    }
-
-    function bufferPoint(point) {
-      const polySym = {
-        type: "simple-fill", // autocasts as new SimpleFillSymbol()
-        color: [140, 140, 222, 0.3],
-        outline: {
-          color: [0, 0, 0, 0.5],
-          width: 2
-        }
-      };
-
-      point.hasZ = false;
-      point.z = undefined;
-
-      const km = kmSelected.value.selectedOption.value;
-      const buffer = geometryEngine.geodesicBuffer(point, km, "kilometers");
-      graphicsLayer.add(
-        new Graphic({
-          geometry: buffer,
-          symbol: polySym
-        })
-      );
-
-      intersectsLayers(buffer);
-    }
-
-    function intersectsLayers(buffer) {
+    function generateByQueryDistritosCreativos() {
       const arr = [];
 
       const queryParamas = new Query();
       queryParamas.outFields = ["*"];
       queryParamas.where = '1=1';
-      queryParamas.geometry = buffer;
+      queryParamas.geometry = distritoGraphicSelected.geometry;
       queryParamas.outSpatialReference = app.view.spatialReference;
       queryParamas.returnGeometry = true;
 
@@ -296,19 +288,56 @@ export default defineComponent({
       });
     }
 
-    function clearGraphics() {
-      app.view.graphics.removeAll();
+    function zoomToDistrito() {
+      distritoGraphicSelected = distritosGraphics.find(
+        (graphic) =>
+          graphic.attributes.OBJECTID.toString() ===
+          distritoSelectedValue.value.selectedOption.value
+      );
+      app.view.goTo(distritoGraphicSelected);
+    }
+
+    function searchClick() {
+      distritosGraphics = [];
       graphicsLayer.removeAll();
+      if (distritoSelectedValue.value.selectedOption.value == 'notselected') {
+        error.value = 'Por favor digita una opción válida'
+      } else {
+        error.value = ''
+        app.view.popup.close();
+        generateByQueryDistritosCreativos();
+      }
+    }
+
+    function clearClick() {
+      graphicsLayer.removeAll();
+      distritoSelectedValue.value = [];
+      distritosGraphics.value = [];
+    }
+
+    function itemClick(feature) {
       app.view.popup.close();
+      const result = featuresResults.filter(item => item.attributes.OBJECTID === feature.OBJECTID && item.attributes.tipo === feature.tipo);
+      const graphic = result[0];
+      graphic.popupTemplate = createMyPopupTemplate(graphic.layer);
+      app.view.popup.open({
+        location: graphic.geometry,
+        features: [graphic]
+      });
+      app.view.goTo(graphic);
+      console.log(graphic.geometry);
     }
 
     return {
-      loading,
-      dataItems,
       searchClick,
       clearClick,
       itemClick,
-      kmSelected
+      loading,
+      error,
+      dataItems,
+      distritosCreativosItems,
+      distritoSelectedValue,
+      distritosGraphics
     };
   },
 });

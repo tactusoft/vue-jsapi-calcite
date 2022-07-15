@@ -31,6 +31,9 @@
       <div v-if="routes.currentRoute === 'DEEP1'" class="route-content">
         <ViewDEEP @goHome="goBackHandler" />
       </div>
+      <div v-if="routes.currentRoute === 'DEEP2'" class="route-content">
+        <ViewDEEPBiblio @goHome="goBackHandler" />
+      </div>
       <div v-if="routes.currentRoute === 'BIBLIO1'" class="route-content">
         <ViewBIBLIO @goHome="goBackHandler" />
       </div>
@@ -54,9 +57,9 @@ import Home from "../../../../views/menu/Home.vue";
 import ViewSICON from "../../../../views/menu/ViewSICON.vue";
 import ViewSISBIC from "../../../../views/menu/ViewSISBIC.vue";
 import ViewDEEP from "../../../../views/menu/ViewDEEP.vue";
+import ViewDEEPBiblio from "../../../../views/menu/ViewDEEPBiblio.vue";
 import ViewBIBLIO from "../../../../views/menu/ViewBIBLIO.vue";
 import VerMas from "../../../../views/menu/VerMas.vue";
-
 
 import "@esri/calcite-components/dist/components/calcite-button";
 import "@esri/calcite-components/dist/components/calcite-icon";
@@ -67,7 +70,7 @@ import '@esri/calcite-components/dist/components/calcite-pick-list';
 
 export default defineComponent({
   name: "Menu",
-  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewBIBLIO, VerMas },
+  components: { ViewSICON, Home, ViewSISBIC, ViewDEEP, ViewDEEPBiblio, ViewBIBLIO, VerMas },
   emits: ["routing"],
   props: {
     show: {

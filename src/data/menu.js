@@ -24,11 +24,15 @@ export const categories = [{
     id: 3,
     name: 'DEEP',
     icon: 'layer-graphics',
-    description: 'Buscar por Nombre, etc...',
+    description: 'Buscar por Localidad y Distrito, etc...',
     subMenus: [{
-        title: "Búsqueda por Nombre",
+        title: "Búsqueda por Localidad y Distrito",
         description: "DEEP",
         route: "DEEP1",
+      },{
+        title: "Búsqueda de Bibliotecas por Distritos",
+        description: "DEEP",
+        route: "DEEP2",
       },]
 },
 {

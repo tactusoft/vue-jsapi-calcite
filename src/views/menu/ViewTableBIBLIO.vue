@@ -4,14 +4,15 @@
         <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
     <div class="mt-5">
-        <h2>Resultados</h2>
+        <h2>Resultados Lecturas</h2>
         <ul class="deepE mt-4" v-if="data?.length > 0">
             <li class="deepE__element" :class="selectedItem === feature.OBJECTID ? 'selected' : ''"
                 v-for="feature in data" :key="feature.OBJECTID" @click="clickItem(feature)">
                 <div style="flex: 1;">
-                    <p>Nombre <span class="semi-bold">{{ feature.LecNombre }}</span></p>
-                    <p>Dirección: {{ feature.LecDirecci }}</p>
-                    <p>Localidad: {{ feature.LecNomLoc }}</p>
+                    <p><span class="semi-bold">{{ feature.nombre }}</span></p>
+                    <p>Dirección: {{ feature.direccion }}</p>
+                    <p>Localidad: {{ feature.localidad }}</p>
+                    <p>Tipo: {{ feature.tipo }}</p>
                 </div>
                 <calcite-icon :icon="selectedItem == feature.OBJECTID ? 'check-square' : 'square'"></calcite-icon>
             </li>
