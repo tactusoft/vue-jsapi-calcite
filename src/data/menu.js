@@ -6,7 +6,7 @@ export const categories = [{
     subMenus: [{
         title: "Búsqueda por Propuestas",
         description: "SICON",
-        route: "SICON",
+        route: "/sicon",
     }]
 },
 {
@@ -17,7 +17,7 @@ export const categories = [{
     subMenus: [{
         title: "Búsqueda por CHIP",
         description: "IDPC",
-        route: "SISBIC1",
+        route: "/sisbic",
       },]
 },
 {
@@ -28,11 +28,11 @@ export const categories = [{
     subMenus: [{
         title: "Búsqueda por Localidad y Distrito",
         description: "DEEP",
-        route: "DEEP1",
+        route: "/deep",
       },{
         title: "Búsqueda de Bibliotecas por Distritos",
         description: "DEEP",
-        route: "DEEP2",
+        route: "/deepbiblio",
       },]
 },
 {
@@ -43,7 +43,7 @@ export const categories = [{
     subMenus: [{
         title: "Buscar Posición Actual",
         description: "BIBLIO",
-        route: "BIBLIO1",
+        route: "/biblio",
       },]
 }
 ]

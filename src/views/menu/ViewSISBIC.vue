@@ -1,6 +1,6 @@
 <template>
   <div v-if="!dataMapa">
-    <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
+    <calcite-button @click="router.back()" appearance="transparent" class="menu__button menu__button--back"
       color="red">
       <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
@@ -24,6 +24,7 @@
 
 <script>
 import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { useRouter } from 'vue-router'
 
 import "@esri/calcite-components/dist/components/calcite-input";
 import "@esri/calcite-components/dist/components/calcite-select";
@@ -54,6 +55,7 @@ export default defineComponent({
     const chip = ref('');
     const error = ref('');
     const dataMapa = ref();
+    const router = useRouter();
 
 
     onMounted(async () => {
@@ -280,7 +282,8 @@ export default defineComponent({
       localidadGraphics,
       loading,
       error,
-      dataMapa
+      dataMapa,
+      router
     };
   },
 });

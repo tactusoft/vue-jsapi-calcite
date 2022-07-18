@@ -46,35 +46,3 @@ export default defineComponent({
     },
 })
 </script>
-
-<style lang="scss">
-.deepE {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-
-    &__element {
-        padding: 10px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        cursor: pointer;
-        border-top: 1px solid #ccc;
-        transition: all 0.5s;
-
-        p {
-            flex: 1;
-        }
-
-        &.selected {
-            background-color: #F9B52C;
-            border: none;
-            font-weight: 700;
-        }
-    }
-}
-
-.semi-bold {
-    font-weight: 600;
-}
-</style>

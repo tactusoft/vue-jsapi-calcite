@@ -7,7 +7,7 @@
 
 <script>
 import { defineComponent } from 'vue'
-import {useRoutes} from '@/store/useRoutes.js'
+import { useRouter } from 'vue-router'
 import '@esri/calcite-components/dist/components/calcite-action';
 import '@esri/calcite-components/dist/components/calcite-pick-list';
 
@@ -33,8 +33,8 @@ export default defineComponent({
         }
     },
     setup (props) {
-        const routes = useRoutes();
-        const routingHandler = () => routes.changeRoute(props.route)
+        const router = useRouter();
+        const routingHandler = () => router.push(props.route)
         return { routingHandler }
     }
 })

@@ -1,6 +1,6 @@
 <template>
   <div v-show="!dataItems">
-    <calcite-button @click="$emit('goHome')" appearance="transparent" class="menu__button menu__button--back"
+    <calcite-button @click="router.back()" appearance="transparent" class="menu__button menu__button--back"
       color="red">
       <calcite-icon icon="arrow-bold-left" scale="s" aria-hidden="true"></calcite-icon>
     </calcite-button>
@@ -32,6 +32,7 @@
 
 <script>
 import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { useRouter } from 'vue-router'
 
 import "@esri/calcite-components/dist/components/calcite-input";
 import "@esri/calcite-components/dist/components/calcite-select";
@@ -71,7 +72,7 @@ export default defineComponent({
     let distritoGraphicSelected;
 
     const loading = ref(false);
-
+    const router = useRouter();
     onMounted(async () => {
       app = await import("../../data/map");
 
@@ -337,7 +338,8 @@ export default defineComponent({
       dataItems,
       distritosCreativosItems,
       distritoSelectedValue,
-      distritosGraphics
+      distritosGraphics,
+      router
     };
   },
 });

@@ -80,3 +80,33 @@ body {
   background: transparent !important;
   border: none !important;
 }
+.deepE {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-height: calc(100vh - 300px);
+  overflow: auto;
+  &__element {
+      padding: 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      cursor: pointer;
+      border-top: 1px solid #ccc;
+      transition: all 0.5s;
+
+      p {
+          flex: 1;
+      }
+
+      &.selected {
+          background-color: #F9B52C;
+          border: none;
+          font-weight: 700;
+      }
+  }
+}
+
+.semi-bold {
+  font-weight: 600;
+}
